@@ -21,19 +21,19 @@ mu = 0.001;
 alpha = [2, 1, 1, 1];
 M = [1.6, 1.3, 3];
 
-r = [1.1 1.2 1.3];
+r = [1.1, 1.2, 1.3];
 Lambda = fliplr(poly(-r))';
 
-plant = @plant4b;
+rho = @(t) (20 - 0.05)*exp(-1*t) + 0.05;
 
-rho1 = @(t) (20 - 0.05)*exp(-1*t) + 0.05;
+plant = @plant4b;
+observer = @(t, z, y) chgo(t, z, y, alpha, mu, M);
 
 tmax = 15;
 ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 
 %% Cascade High-Gain Observer
-observer = @(t, z, y) chgo(t, z, y, alpha, mu, M);
-sys1 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho1, k, sat);
+sys1 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho, k, sat);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
 
@@ -49,11 +49,10 @@ for i = 3:n
    xhat(:, i) = min(M(i-1), max(-M(i-1), alpha(i)/mu*(z(:, i) + xhat(:, i-1))));
 end
 
-% Reconstruct sliding surface and its estimate
+% Reconstruct sliding surface, its estimate and the control input
 s = x*Lambda;
 shat = xhat*Lambda;
-u = min(sat, max(-sat, -k*log((1 + s./rho1(t))./(1 - s./rho1(t)))));
-
+u = min(sat, max(-sat, -k*log((1 + s./rho(t))./(1 - s./rho(t)))));
 
 %% Plots
 figure();
@@ -90,7 +89,7 @@ subplot(2, 1, 1)
     hold on;
     plot(t, s, 'k');
     plot(t, shat, '--k');
-    plot([t, t], [rho1(t), -rho1(t)], ':k'); 
+    plot([t, t], [rho(t), -rho(t)], ':k'); 
     ylabel('$s(x(t)), s(\hat{x}(t))$', 'Interpreter', 'Latex');
 subplot(2, 1, 2)
     box on;
