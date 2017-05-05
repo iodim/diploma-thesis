@@ -15,20 +15,20 @@ x0 = ones(n, 1);
 z0 = zeros(n,1);
 q0 = [x0; z0];
 
-k = 5;
-sat = 10;
+k = 12;
+sat = inf;
 mu = 0.001;
 alpha = [2, 1, 1, 1];
-M = [1.6, 1.2, 3];
+M = [1.6, 1.3, 3];
 
-r = [10 10 10];
+r = [1.1 1.2 1.3];
 Lambda = fliplr(poly(-r))';
 
 plant = @plant4b;
 
-rho1 = @(t) (10 - 0.01)*exp(-5*t) + 0.01;
+rho1 = @(t) (20 - 0.05)*exp(-1*t) + 0.05;
 
-tmax = 50;
+tmax = 15;
 ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 
 %% Cascade High-Gain Observer
@@ -49,6 +49,11 @@ for i = 3:n
    xhat(:, i) = min(M(i-1), max(-M(i-1), alpha(i)/mu*(z(:, i) + xhat(:, i-1))));
 end
 
+% Reconstruct sliding surface and its estimate
+s = x*Lambda;
+shat = xhat*Lambda;
+u = min(sat, max(-sat, -k*log((1 + s./rho1(t))./(1 - s./rho1(t)))));
+
 
 %% Plots
 figure();
@@ -57,18 +62,39 @@ subplot(2, 2, 1)
     hold on;
     plot(t, x(:, 1), 'k');
     plot(t, xhat(:, 1), '--k');
+    ylabel('$x_1(t), \hat{x}_1(t)$', 'Interpreter', 'Latex');
 subplot(2, 2, 2)
     box on;
     hold on;
     plot(t, x(:, 2), 'k');
     plot(t, xhat(:, 2), '--k');
+    ylabel('$x_2(t), \hat{x}_2(t)$', 'Interpreter', 'Latex');    
 subplot(2, 2, 3)
     box on;
     hold on;
     plot(t, x(:, 3), 'k');
     plot(t, xhat(:, 3), '--k');
+    ylabel('$x_3(t), \hat{x}_3(t)$', 'Interpreter', 'Latex');
+    xlabel('$t$', 'Interpreter', 'Latex');
 subplot(2, 2, 4)
     box on;
     hold on;
     plot(t, x(:, 4), 'k');
     plot(t, xhat(:, 4), '--k');   
+    ylabel('$x_4(t), \hat{x}_4(t)$', 'Interpreter', 'Latex');
+    xlabel('$t$', 'Interpreter', 'Latex');
+
+figure();
+subplot(2, 1, 1)
+    box on;
+    hold on;
+    plot(t, s, 'k');
+    plot(t, shat, '--k');
+    plot([t, t], [rho1(t), -rho1(t)], ':k'); 
+    ylabel('$s(x(t)), s(\hat{x}(t))$', 'Interpreter', 'Latex');
+subplot(2, 1, 2)
+    box on;
+    hold on;
+    plot(t, u, 'k')
+    ylabel('$u(t)$', 'Interpreter', 'Latex');
+    xlabel('$t$', 'Interpreter', 'Latex');
