@@ -61,36 +61,31 @@ u = min(sat, max(-sat, u));
 %% Plots
 figure();
 subplot(2, 2, 1)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 1)), 1.1*max(x(:, 1))]);
     plot(t, x(:, 1), 'k');
     plot(t, xhat(:, 1), '--k');
     ylabel('$x_1(t), \hat{x}_1(t)$', 'Interpreter', 'Latex');
 subplot(2, 2, 2)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 2)), 1.1*max(x(:, 2))]);
     plot(t, x(:, 2), 'k');
     plot(t, xhat(:, 2), '--k');
     ylabel('$x_2(t), \hat{x}_2(t)$', 'Interpreter', 'Latex');    
 subplot(2, 2, 3)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 3)), 1.1*max(x(:, 3))]);
     plot(t, x(:, 3), 'k');
     plot(t, xhat(:, 3), '--k');
     ylabel('$x_3(t), \hat{x}_3(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
 subplot(2, 2, 4)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 4)), 1.1*max(x(:, 4))]);
     plot(t, x(:, 4), 'k');
     plot(t, xhat(:, 4), '--k');   
     ylabel('$x_4(t), \hat{x}_4(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
 
 figure();
-subplot(2, 1, 1)
-    box on;
-    hold on;
+subplot(2, 1, 1);
+    box on; hold on; axis([0, max(t), -1.1*rho(0), 1.1*rho(0)]);
     plot(t, s, 'k');
     plot(t, shat, '--k');
     plot([t, t], [rho(t), -rho(t)], ':k'); 
@@ -138,27 +133,23 @@ u = min(sat, max(-sat, u));
 %% Plots
 figure();
 subplot(2, 2, 1)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 1)), 1.1*max(x(:, 1))]);
     plot(t, x(:, 1), 'k');
     plot(t, xhat(:, 1), '--k');
     ylabel('$x_1(t), \hat{x}_1(t)$', 'Interpreter', 'Latex');
 subplot(2, 2, 2)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 2)), 1.1*max(x(:, 2))]);
     plot(t, x(:, 2), 'k');
     plot(t, xhat(:, 2), '--k');
     ylabel('$x_2(t), \hat{x}_2(t)$', 'Interpreter', 'Latex');    
 subplot(2, 2, 3)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 3)), 1.1*max(x(:, 3))]);
     plot(t, x(:, 3), 'k');
     plot(t, xhat(:, 3), '--k');
     ylabel('$x_3(t), \hat{x}_3(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
 subplot(2, 2, 4)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), 1.1*min(x(:, 4)), 1.1*max(x(:, 4))]);
     plot(t, x(:, 4), 'k');
     plot(t, xhat(:, 4), '--k');   
     ylabel('$x_4(t), \hat{x}_4(t)$', 'Interpreter', 'Latex');
@@ -166,8 +157,7 @@ subplot(2, 2, 4)
 
 figure();
 subplot(2, 1, 1)
-    box on;
-    hold on;
+    box on; hold on; axis([0, max(t), -1.1*rho(0), 1.1*rho(0)]);
     plot(t, s, 'k');
     plot(t, shat, '--k');
     plot([t, t], [rho(t), -rho(t)], ':k'); 
