@@ -72,11 +72,19 @@ sys3 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho3, k, sat);
 
 % Control input reconstruction
 s1 = q1(:, 3:4)*Lambda;
-u1 = min(sat, max(-sat, real(-k*log((1 + s1./rho1(t1))./(1 - s1./rho1(t1))))));
+u1 = -k*log((1 + s1./rho1(t1))./(1 - s1./rho1(t1)));
+u1(imag(u1) ~= 0) = sign(real(u1(imag(u1) ~= 0)))*sat;
+u1 = min(sat, max(-sat, u1));
+
 s2 = q2(:, 3:4)*Lambda;
-u2 = min(sat, max(-sat, real(-k*log((1 + s2./rho2(t2))./(1 - s2./rho1(t2))))));
+u2 = -k*log((1 + s2./rho2(t2))./(1 - s2./rho2(t2)));
+u2(imag(u2) ~= 0) = sign(real(u2(imag(u2) ~= 0)))*sat;
+u2 = min(sat, max(-sat, u2));
+
 s3 = q3(:, 3:4)*Lambda;
-u3 = min(sat, max(-sat, real(-k*log((1 + s3./rho3(t3))./(1 - s3./rho3(t3))))));
+u3 = -k*log((1 + s3./rho3(t3))./(1 - s3./rho3(t3)));
+u3(imag(u3) ~= 0) = sign(real(u3(imag(u3) ~= 0)))*sat;
+u3 = min(sat, max(-sat, u3));
 
 figure('Position', [450 300 800 400]);
 

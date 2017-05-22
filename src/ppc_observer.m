@@ -40,8 +40,10 @@ function [dq] = ppc_observer(t, q, plant, observer, Lambda, rho, k, sat)
     s = Lambda'*xhat;
     ksi = s/rho(t);
 %     ksi = min(1-1e-16, max(-1+1e-16, s/rho(t)));
-    u = min(sat, max(-sat, -k*log((1 + ksi)/(1 - ksi))));
+    if isinf(sat); u = -k*log((1 + ksi)/(1 - ksi));
+    else u = min(sat, max(-sat, -k*log((1 + ksi)/(1 - ksi))));
+    end
     dx = plant(t, x, u);
-   
+
     dq = [dx(:); dz(:)];
 end

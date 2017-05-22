@@ -54,7 +54,9 @@ end
 % Reconstruct sliding surface, its estimate and the control input
 s = x*Lambda;
 shat = xhat*Lambda;
-u = min(sat, max(-sat, -k*log((1 + s./rho(t))./(1 - s./rho(t)))));
+u = -k*log((1 + shat./rho(t))./(1 - shat./rho(t)));
+u(imag(u) ~= 0) = sign(real(u(imag(u) ~= 0)))*sat;
+u = min(sat, max(-sat, u));
 
 %% Plots
 figure();
@@ -94,7 +96,7 @@ subplot(2, 1, 1)
     plot([t, t], [rho(t), -rho(t)], ':k'); 
     ylabel('$s(x(t)), s(\hat{x}(t))$', 'Interpreter', 'Latex');
     % peaking plot
-    axes('position', [.68 .72 .2 .2]); 
+    axes('position', [.675 .675 .2 .2]); 
     box on; hold on; axis tight;
     plot(t(t_p), s(t_p), 'k');
     plot(t(t_p), shat(t_p), '--k');
@@ -107,13 +109,13 @@ subplot(2, 1, 2)
     ylabel('$u(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
     % peaking plot
-    axes('position', [.275 .15 .2 .2]); 
+    axes('position', [.675 .175 .2 .2]); 
     box on; hold on; axis tight;
     plot(t(t_p), u(t_p), 'k')
 
 
 %% Regular High-Gain Observer
-peak = 0.015;
+peak = 0.05;
 sat = 15;
 alpha = [4, 6, 4, 1];
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
@@ -129,7 +131,9 @@ xhat = q(:, n+1:end);
 
 s = x*Lambda;
 shat = xhat*Lambda;
-u = min(sat, max(-sat, real(-k*log((1 + shat./rho(t))./(1 - shat./rho(t))))));
+u = -k*log((1 + shat./rho(t))./(1 - shat./rho(t)));
+u(imag(u) ~= 0) = sign(real(u(imag(u) ~= 0)))*sat;
+u = min(sat, max(-sat, u));
 
 %% Plots
 figure();
@@ -169,7 +173,7 @@ subplot(2, 1, 1)
     plot([t, t], [rho(t), -rho(t)], ':k'); 
     ylabel('$s(x(t)), s(\hat{x}(t))$', 'Interpreter', 'Latex');
     % peaking plot
-    axes('position', [.68 .72 .2 .2]); 
+    axes('position', [.675 .675 .2 .2]); 
     box on; hold on; axis tight;
     plot(t(t_p), s(t_p), 'k');
     plot(t(t_p), shat(t_p), '--k');
@@ -182,6 +186,6 @@ subplot(2, 1, 2)
     ylabel('$u(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
     % peaking plot
-    axes('position', [.275 .15 .2 .2]); 
-    box on; hold on; axis tight;
+    axes('position', [.675 .175 .2 .2]); 
+    box on; hold on; axis([0, max(t(t_p)), -1.1*sat, 1.1*sat]);
     plot(t(t_p), u(t_p), 'k')
