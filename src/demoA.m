@@ -37,27 +37,61 @@ sys3 = @(t, q) ppc(t, q, plant, Lambda, rho3, k);
 [t2, q2] = ode15s(sys2, [0 tmax], q0, ode_options);
 [t3, q3] = ode15s(sys3, [0 tmax], q0, ode_options);
 
+% Surface and control input reconstruction
+s1 = q1*Lambda;
+u1 = -k*log((1 + s1./rho1(t1))./(1 - s1./rho1(t1)));
+u1(imag(u1) ~= 0) = sign(real(u1(imag(u1) ~= 0)))*sat;
+% u1 = min(sat, max(-sat, u1));
+
+s2 = q2*Lambda;
+u2 = -k*log((1 + s2./rho2(t2))./(1 - s2./rho2(t2)));
+u2(imag(u2) ~= 0) = sign(real(u2(imag(u2) ~= 0)))*sat;
+% u2 = min(sat, max(-sat, u2));
+
+s3 = q3*Lambda;
+u3 = -k*log((1 + s3./rho3(t3))./(1 - s3./rho3(t3)));
+u3(imag(u3) ~= 0) = sign(real(u3(imag(u3) ~= 0)))*sat;
+% u3 = min(sat, max(-sat, u3));
+
+
 figure('Position', [50 300 400 400]);
-subplot(3, 1, 1);
+% r_bar = 0.5
+subplot(3, 2, 1);
     hold on; box on;
     plot(t1, q1(:, 1), 'k');
     plot(t1, q1(:, 2), '--k');
     ylabel('$\bar{r} = 0.5$', 'Interpreter', 'Latex');
     axis([0 tmax -5 5])
     title('$x_1(t), x_2(t)$', 'Interpreter', 'Latex')
-subplot(3, 1, 2);
+subplot(3, 2, 2);
+    hold on; box on;
+    plot(t1, u1, 'k');
+    axis([0 tmax 1.1*min(u3) 1.1*max(u1)])
+    title('$u(t)$', 'Interpreter', 'Latex')
+% r_bar = 1    
+subplot(3, 2, 3);
     hold on; box on;
     plot(t2, q2(:, 1), 'k');
     plot(t2, q2(:, 2), '--k');
     ylabel('$\bar{r} = 1$', 'Interpreter', 'Latex');
     axis([0 tmax -5 5])
-subplot(3, 1, 3);
+subplot(3, 2, 4);
+    hold on; box on;
+    plot(t2, u2, 'k');
+    axis([0 tmax 1.1*min(u2) 1.1*max(u2)])
+% r_bar = 2
+subplot(3, 2, 5);
     hold on; box on;
     plot(t3, q3(:, 1), 'k');
     plot(t3, q3(:, 2), '--k');
     xlabel('$t$', 'Interpreter', 'Latex');
     ylabel('$\bar{r} = 2$', 'Interpreter', 'Latex');
     axis([0 tmax -5 5])
+subplot(3, 2, 6);
+    hold on; box on;
+    plot(t3, u3, 'k');
+    axis([0 tmax 1.1*min(u3) 1.1*max(u3)])
+    xlabel('$t$', 'Interpreter', 'Latex');
 suptitle('State feedback')    
 
 %% High-Gain Observer

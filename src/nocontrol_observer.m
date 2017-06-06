@@ -1,5 +1,5 @@
 function [dq] = nocontrol_observer(t, q, plant, observer)
-%NOCONTROL_OBSERVER Applies an observer to given plant (no control).
+%NOCONTROL_OBSERVER Applies an observer to given plant (no controller).
 %
 %   Assumes that the plant adheres to the following signature:
 %
@@ -16,7 +16,6 @@ function [dq] = nocontrol_observer(t, q, plant, observer)
 %   the plant's state estimations. The input arguments t, z, y, represent 
 %   the time instant, the observer's previous state, and the plant's output
 %   respectively. 
-
 
 %   Ioannis Dimanidis (2017)
     q = q(:);
