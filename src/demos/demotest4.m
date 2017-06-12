@@ -7,7 +7,7 @@ x0 = ones(n, 1);
 z0 = zeros(n,1);
 q0 = [x0; z0];
 
-k = 2;
+k = 1;
 satlvl = 1 - 1e-16;
 mu = 0.01;
 alpha = [4, 6, 4, 1];
@@ -21,11 +21,11 @@ plant = @plant4b;
 
 tmax = 15;
 peaking_time = 0.05;
-ode_options = odeset('AbsTol', 1e-16, 'RelTol', 1e-13);
+ode_options = odeset('AbsTol', 1e-16, 'RelTol', 1e-12);
 
 %% High-Gain Observer
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
-controller = @(t, x, w) ppc_sat2(t, x, Lambda, rho, k, satlvl);
+controller = @(t, x, w) ppc_sigma(t, x, Lambda, rho, k, satlvl);
 sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
