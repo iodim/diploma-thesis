@@ -21,7 +21,7 @@ plant = @plant4b;
 
 tmax = 15;
 peaking_time = 0.05;
-ode_options = odeset('AbsTol', 1e-16, 'RelTol', 1e-12);
+ode_options = odeset('AbsTol', 1e-6, 'RelTol', 1e-3);
 
 %% High-Gain Observer
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
