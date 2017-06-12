@@ -1,4 +1,21 @@
-function [dq] = dwell_ppc_observer(t, q, plant, observer, Lambda, rho, k, sat, td)
+function [u, dw] = ppc_sat2(t, x, Lambda, rho, k, satlvl)
+%PPC Prescribed Perfomance Controller implementation with saturation.
+%
+%   See more:
+%   Bechlioulis, Charalampos P., Achilles Theodorakopoulos, and George A. 
+%   Rovithakis. "Output feedback stabilization with prescribed performance 
+%   for uncertain nonlinear systems in canonical form" Decision and Control
+%   (CDC), 2013 IEEE 52nd Annual Conference on. IEEE, 2013.
+   
+%   Ioannis Dimanidis (2017)
+
+    s = (Lambda'*x)';
+    ksi = sat(s./rho(t), satlvl);
+    u = -k*log((1 + ksi)./(1 - ksi));
+    dw = [];
+end
+
+function [dq] = ppc_observer2(t, q, plant, observer, Lambda, rho, k, sat)
 %PPC Prescribed Perfomance Controller implementation (output feedback).
 %
 %   [dq] = PPC_OBSERVER(t, q, plant, observer, Lambda, rho, k, sat) 
@@ -39,15 +56,12 @@ function [dq] = dwell_ppc_observer(t, q, plant, observer, Lambda, rho, k, sat, t
     
     s = Lambda'*xhat;
     ksi = s/rho(t);
-%     ksi = min(1-1e-16, max(-1+1e-16, s/rho(t)));
-    if t < td; u = 0;
-    else
-        if isinf(sat); u = -k*log((1 + ksi)/(1 - ksi));
-        else u = min(sat, max(-sat, -k*log((1 + ksi)/(1 - ksi))));
-        end
+%     ksi = sigma(ksi);
+    ksi = min(1-1e-16, max(-1+1e-16, ksi));
+    if isinf(sat); u = -k*log((1 + ksi)/(1 - ksi));
+    else u = min(sat, max(-sat, -k*log((1 + ksi)/(1 - ksi))));
     end
-    
     dx = plant(t, x, u);
-   
+
     dq = [dx(:); dz(:)];
 end

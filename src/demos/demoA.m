@@ -29,30 +29,22 @@ tmax = 5;
 ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 
 %% Full state feedback
-sys1 = @(t, q) ppc(t, q, plant, Lambda, rho1, k);
-sys2 = @(t, q) ppc(t, q, plant, Lambda, rho2, k);
-sys3 = @(t, q) ppc(t, q, plant, Lambda, rho3, k);
+controller1 = @(t, x, w) ppc(t, x, Lambda, rho1, k);
+controller2 = @(t, x, w) ppc(t, x, Lambda, rho2, k);
+controller3 = @(t, x, w) ppc(t, x, Lambda, rho3, k);
+
+sys1 = @(t, q) control_loop(t, q, plant, [2 0 0], controller1);
+sys2 = @(t, q) control_loop(t, q, plant, [2 0 0], controller2);
+sys3 = @(t, q) control_loop(t, q, plant, [2 0 0], controller3);
 
 [t1, q1] = ode15s(sys1, [0 tmax], q0, ode_options);
 [t2, q2] = ode15s(sys2, [0 tmax], q0, ode_options);
 [t3, q3] = ode15s(sys3, [0 tmax], q0, ode_options);
 
 % Surface and control input reconstruction
-s1 = q1*Lambda;
-u1 = -k*log((1 + s1./rho1(t1))./(1 - s1./rho1(t1)));
-u1(imag(u1) ~= 0) = sign(real(u1(imag(u1) ~= 0)))*sat;
-% u1 = min(sat, max(-sat, u1));
-
-s2 = q2*Lambda;
-u2 = -k*log((1 + s2./rho2(t2))./(1 - s2./rho2(t2)));
-u2(imag(u2) ~= 0) = sign(real(u2(imag(u2) ~= 0)))*sat;
-% u2 = min(sat, max(-sat, u2));
-
-s3 = q3*Lambda;
-u3 = -k*log((1 + s3./rho3(t3))./(1 - s3./rho3(t3)));
-u3(imag(u3) ~= 0) = sign(real(u3(imag(u3) ~= 0)))*sat;
-% u3 = min(sat, max(-sat, u3));
-
+u1 = controller1(t1, q1');
+u2 = controller2(t2, q2');
+u3 = controller3(t3, q3');
 
 figure('Position', [50 300 400 400]);
 % r_bar = 0.5
@@ -66,7 +58,7 @@ subplot(3, 2, 1);
 subplot(3, 2, 2);
     hold on; box on;
     plot(t1, u1, 'k');
-    axis([0 tmax 1.1*min(u3) 1.1*max(u1)])
+    axis([0 tmax 1.1*min(u1) 1.1*max(u1)])
     title('$u(t)$', 'Interpreter', 'Latex')
 % r_bar = 1    
 subplot(3, 2, 3);
@@ -96,32 +88,25 @@ suptitle('State feedback')
 
 %% High-Gain Observer
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
-sys1 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho1, k, sat);
-sys2 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho2, k, sat);
-sys3 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho3, k, sat);
+
+controller1 = @(t, x, w) ppc_sat(t, x, Lambda, rho1, k, sat);
+controller2 = @(t, x, w) ppc_sat(t, x, Lambda, rho2, k, sat);
+controller3 = @(t, x, w) ppc_sat(t, x, Lambda, rho3, k, sat);
+
+sys1 = @(t, q) control_loop(t, q, plant, [2 0 2], controller1, observer);
+sys2 = @(t, q) control_loop(t, q, plant, [2 0 2], controller2, observer);
+sys3 = @(t, q) control_loop(t, q, plant, [2 0 2], controller3, observer);
 
 [t1, q1] = ode15s(sys1, [0 tmax], [q0; qhat0], ode_options);
 [t2, q2] = ode15s(sys2, [0 tmax], [q0; qhat0], ode_options);
 [t3, q3] = ode15s(sys3, [0 tmax], [q0; qhat0], ode_options);
 
 % Control input reconstruction
-s1 = q1(:, 3:4)*Lambda;
-u1 = -k*log((1 + s1./rho1(t1))./(1 - s1./rho1(t1)));
-u1(imag(u1) ~= 0) = sign(real(u1(imag(u1) ~= 0)))*sat;
-u1 = min(sat, max(-sat, u1));
-
-s2 = q2(:, 3:4)*Lambda;
-u2 = -k*log((1 + s2./rho2(t2))./(1 - s2./rho2(t2)));
-u2(imag(u2) ~= 0) = sign(real(u2(imag(u2) ~= 0)))*sat;
-u2 = min(sat, max(-sat, u2));
-
-s3 = q3(:, 3:4)*Lambda;
-u3 = -k*log((1 + s3./rho3(t3))./(1 - s3./rho3(t3)));
-u3(imag(u3) ~= 0) = sign(real(u3(imag(u3) ~= 0)))*sat;
-u3 = min(sat, max(-sat, u3));
+u1 = controller1(t1, q1(:, 3:4)');
+u2 = controller2(t2, q2(:, 3:4)');
+u3 = controller3(t3, q3(:, 3:4)');
 
 figure('Position', [450 300 800 400]);
-
 % r_bar = 0.5
 subplot(3, 3, 1);
     hold on; box on;

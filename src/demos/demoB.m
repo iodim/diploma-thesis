@@ -16,7 +16,6 @@ z0 = zeros(n,1);
 q0 = [x0; z0];
 
 k = 12;
-sat = inf;
 mu = 0.001;
 alpha = [2, 1, 1, 1];
 % M = [1.6, 1.3, 3];
@@ -35,7 +34,8 @@ ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 %% Cascade High-Gain Observer
 peak = 0.05;
 observer = @(t, z, y) chgo(t, z, y, alpha, mu, M);
-sys1 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho, k, sat);
+controller = @(t, x, w) ppc(t, x, Lambda, rho, k);
+sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
 t_p = (t < peak);
@@ -46,18 +46,16 @@ z = q(:, n+1:end);
 
 xhat = zeros(size(x));
 xhat(:, 1) = z(:, 1);
-xhat(:, 2) = min(M(1), max(-M(1), z(:, 2)/mu));
+xhat(:, 2) = sat(z(:, 2)/mu, M(1));
 
 for i = 3:n
-   xhat(:, i) = min(M(i-1), max(-M(i-1), alpha(i)/mu*(z(:, i) + xhat(:, i-1))));
+   xhat(:, i) = sat(alpha(i)/mu*(z(:, i) + xhat(:, i-1)), M(i-1));
 end
 
 % Reconstruct sliding surface, its estimate and the control input
 s = x*Lambda;
 shat = xhat*Lambda;
-u = -k*log((1 + shat./rho(t))./(1 - shat./rho(t)));
-u(imag(u) ~= 0) = sign(real(u(imag(u) ~= 0)))*sat;
-u = min(sat, max(-sat, u));
+u = controller(t, xhat');
 
 %% Plots
 figure();
@@ -112,13 +110,14 @@ subplot(2, 1, 2)
 
 %% Regular High-Gain Observer
 peak = 0.05;
-sat = 15;
+satlvl = 15;
 alpha = [4, 6, 4, 1];
+
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
+controller = @(t, x, w) ppc_sat(t, x, Lambda, rho, k, satlvl);
+sys2 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
-sys1 = @(t, q) ppc_observer(t, q, plant, observer, Lambda, rho, k, sat);
-
-[t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
+[t, q] = ode15s(sys2, [0 tmax], q0, ode_options);
 t_p = (t < peak);
 
 % Reconstruct sliding surface, its estimate and the control input
@@ -127,9 +126,7 @@ xhat = q(:, n+1:end);
 
 s = x*Lambda;
 shat = xhat*Lambda;
-u = -k*log((1 + shat./rho(t))./(1 - shat./rho(t)));
-u(imag(u) ~= 0) = sign(real(u(imag(u) ~= 0)))*sat;
-u = min(sat, max(-sat, u));
+u = controller(t, xhat');
 
 %% Plots
 figure();
@@ -178,5 +175,5 @@ subplot(2, 1, 2)
     xlabel('$t$', 'Interpreter', 'Latex');
     % peaking plot
     axes('position', [.675 .175 .2 .2]); 
-    box on; hold on; axis([0, max(t(t_p)), -1.1*sat, 1.1*sat]);
+    box on; hold on; axis([0, max(t(t_p)), -1.1*satlvl, 1.1*satlvl]);
     plot(t(t_p), u(t_p), 'k')

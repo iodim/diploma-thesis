@@ -9,21 +9,30 @@
 clc; clear; close all;
 
 %% Parameters
-n = 4;
-k = 1;
-sat = inf;
+% RED parameters
+L = 5;
+muV = [1 1 1 1];
+lambda = [2 2 3 4];
+
+% HGO parameters
 mu = 0.01;
+alpha = [4, 6, 4, 1];
+
+% General parameters
+n = 4;
 q0 = [1; 1; 1; 1];
 qhat0 = [1; 0; 0; 0];
 
 plant = @plant4b;
 
-tmax = 5;
-ode_options = odeset('AbsTol', 1e-16, 'RelTol', 1e-13);
+tmax = 15;
+ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 
 %% Robust Exact Differentiator (RED)
-observer = @(t, xhat, y) red(t, xhat, y, [30, 30, 20, 20]);
-sys = @(t, q) nocontrol_observer(t, q, plant, observer);
+% observer = @(t, xhat, y) gfed(t, xhat, y, lambda, L, muV);
+observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
+controller = @(t, x, w) nocontrol();
+sys = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys, [0 tmax], [q0; qhat0], ode_options);
 

@@ -1,11 +1,3 @@
-%DEMOB Performs a simulation demo for plant4b using PPC and CHGO.
-%
-%   See more:
-%   Bechlioulis, Charalampos P., Achilles Theodorakopoulos, and George A. 
-%   Rovithakis. "Output feedback stabilization with prescribed performance 
-%   for uncertain nonlinear systems in canonical form." Decision and Control
-%   (CDC), 2013 IEEE 52nd Annual Conference on. IEEE, 2013.
-   
 %   Ioannis Dimanidis (2017)
 clc; clear; close all;
 
@@ -16,7 +8,7 @@ z0 = zeros(n,1);
 q0 = [x0; z0];
 
 k = 2;
-sat = inf;
+satlvl = 1 - 1e-16;
 mu = 0.01;
 alpha = [4, 6, 4, 1];
 
@@ -33,8 +25,8 @@ ode_options = odeset('AbsTol', 1e-16, 'RelTol', 1e-13);
 
 %% High-Gain Observer
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
-
-sys1 = @(t, q) ppc_observer2(t, q, plant, observer, Lambda, rho, k, sat);
+controller = @(t, x, w) ppc_sat2(t, x, Lambda, rho, k, satlvl);
+sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
 t_p = (t < peaking_time);
@@ -45,8 +37,7 @@ xhat = q(:, n+1:end);
 
 s = x*Lambda;
 shat = xhat*Lambda;
-ksihat = min(1-1e-16, max(-1+1e-16, shat./rho(t)));
-u = -k*log((1 + ksihat)./(1 - ksihat));
+u = controller(t, xhat');
 
 %% Plots
 figure();
