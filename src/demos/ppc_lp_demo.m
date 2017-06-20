@@ -19,7 +19,7 @@ rho = @(t) (30 - 0.05)*exp(-2*t) + 0.05;
 plant = @plant4c;
 
 tmax = 10;
-peaking_time = 0.05;
+peak = 0.05;
 ode_options = odeset('AbsTol', 1e-6, 'RelTol', 1e-3);
 
 %% Output feedback (PPC-Sat w/ HGO )
@@ -30,7 +30,6 @@ controller = @(t, x, w) ppc_sat(t, x, Lambda, rho, k, satlvl);
 sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
-t_p = (t < peaking_time);
 
 % Reconstruct sliding surface, its estimate, and the control input
 x = q(:, 1:n);
@@ -40,12 +39,14 @@ s = x*Lambda;
 shat = xhat*Lambda;
 u = controller(t, xhat');
 
-plotter4(t, x, s, rho, u, xhat, shat, t_p);
 if any(find(s./rho(t) >= 1))
     fprintf('PPC-Sat w/ HGO:\n\t Surface violated perfomance.\n');
 else
     fprintf('PPC-Sat w/ HGO:\n\t Surface did not violate perfomance.\n');
 end
+
+plotter('t', t, 'x', x, 's', s, 'rho', rho, 'u', u, 'xhat', xhat, ...
+        'shat', shat, 'peak', peak);
 
 
 %% Output feedback (PPC-Sat-LP w/ HGO )
@@ -58,7 +59,6 @@ controller = @(t, x, w) ppc_sat_lp(t, x, Lambda, rho, k, satlvl, w, omega0, filt
 sys1 = @(t, q) control_loop(t, q, plant, [n filtrank n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
-t_p = (t < peaking_time);
 
 % Reconstruct sliding surface, its estimate, and the control input
 x = q(:, 1:n);
@@ -69,10 +69,12 @@ s = x*Lambda;
 shat = xhat*Lambda;
 u = controller(t, xhat', w');
 
-plotter4(t, x, s, rho, u, xhat, shat, t_p);
 if any(find(s./rho(t) >= 1))
     fprintf('PPC-Sat-LP w/ HGO:\n\t Surface violated perfomance.\n');
 else
     fprintf('PPC-Sat-LP w/ HGO:\n\t Surface did not violate perfomance.\n');
 end
+
+plotter('t', t, 'x', x, 's', s, 'rho', rho, 'u', u, 'xhat', xhat, ...
+        'shat', shat, 'peak', peak);
 

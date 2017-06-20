@@ -39,7 +39,7 @@ else
     fprintf('PPC-Sat w/ HGO:\n\t Surface did not violate perfomance.\n');
 end
 
-plotter2(t, x, s, rho, u, xhat, shat)
+plotter('t', t, 'x', x, 's', s, 'rho', rho, 'u', u, 'xhat', xhat, 'shat', shat);
 
 %% PPC-Sigma (w/ HGO)
 satlvl = 1 - 1e-8;
@@ -61,4 +61,4 @@ else
     fprintf('PPC-Sigma w/ HGO:\n\t Surface did not violate perfomance.\n');
 end
 
-plotter2(t, x, s, rho, u, xhat, shat)
+plotter('t', t, 'x', x, 's', s, 'rho', rho, 'u', u, 'xhat', xhat, 'shat', shat);

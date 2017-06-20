@@ -23,7 +23,7 @@ observer = @(t, z, y) chgo(t, z, y, alpha, mu, M);
 controller = @(t, x, w) nocontrol();
 sys = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
-tmax = 0.1;
+tmax = 0.15;
 ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 
 %% Simulation
@@ -41,25 +41,4 @@ for i = 3:n
    xhat(:, i) = sat(alpha(i)/mu*(z(:, i) + xhat(:, i-1)), M(i-1));
 end
 
-%% Plots
-figure();
-subplot(2, 2, 1)
-    box on;
-    hold on;
-    plot(t, x(:, 1), 'k');
-    plot(t, xhat(:, 1), '--k');
-subplot(2, 2, 2)
-    box on;
-    hold on;
-    plot(t, x(:, 2), 'k');
-    plot(t, xhat(:, 2), '--k');
-subplot(2, 2, 3)
-    box on;
-    hold on;
-    plot(t, x(:, 3), 'k');
-    plot(t, xhat(:, 3), '--k');
-subplot(2, 2, 4)
-    box on;
-    hold on;
-    plot(t, x(:, 4), 'k');
-    plot(t, xhat(:, 4), '--k');    
+plotter('t', t, 'x', x, 'xhat', xhat) 
