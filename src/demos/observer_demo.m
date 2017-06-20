@@ -60,11 +60,10 @@ subplot(2, 2, 3)
 subplot(2, 2, 4)
     box on; hold on; axis([0, max(t), 1.1*min(x(:, 4)), 1.1*max(x(:, 4))]);
     plot(t, x(:, 4), 'k');
-    plot(t, xhat(:, 4), '--k');   
+    plot(t, xhat(:, 4), '--k');
     ylabel('$x_4(t), \hat{x}_4(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
 
-    
 %% High-Gain Observer (HGO)
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
 controller = @(t, x, w) nocontrol();
@@ -96,7 +95,6 @@ subplot(2, 2, 3)
 subplot(2, 2, 4)
     box on; hold on; axis([0, max(t), 1.1*min(x(:, 4)), 1.1*max(x(:, 4))]);
     plot(t, x(:, 4), 'k');
-    plot(t, xhat(:, 4), '--k');   
+    plot(t, xhat(:, 4), '--k');
     ylabel('$x_4(t), \hat{x}_4(t)$', 'Interpreter', 'Latex');
     xlabel('$t$', 'Interpreter', 'Latex');
-    
