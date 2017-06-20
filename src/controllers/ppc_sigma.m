@@ -10,7 +10,7 @@ function [u, dw] = ppc_sigma(t, x, Lambda, rho, k, satlvl)
 %   Ioannis Dimanidis (2017)
 
     s = (Lambda'*x)';
-    ksi = sigma(s./rho(t));
+    ksi = sigma(s./rho(t), satlvl);
     u = -k*log((1 + ksi)./(1 - ksi));
     dw = [];
 end
