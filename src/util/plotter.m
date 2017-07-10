@@ -55,7 +55,17 @@ function [] = plotter(varargin)
             end
             box on; 
             hold on; 
-            axis([0, max(t), 1.1*min(x(:, i)), 1.1*max(x(:, i))]);
+            
+            ymin = min(x(:, i));
+            ymax = max(x(:, i));
+            
+            if ymin < 0, ymin = 1.1*ymin; 
+            else ymin = 0.9*ymin; end
+            
+            if ymax > 0, ymax = 1.1*ymax; 
+            else ymax = 0.9*ymax; end
+                
+            axis([0, max(t), ymin, ymax]);
             plot(t, x(:, i), 'k');
             if plot_xhat
                 plot(t, xhat(:, i), '--k');
@@ -105,7 +115,9 @@ function [] = plotter(varargin)
                 hold on;
                 axis tight;
                 plot(t(t_p), s(t_p), 'k');
-                plot(t(t_p), shat(t_p), '--k');
+                if plot_shat
+                    plot(t(t_p), shat(t_p), '--k');
+                end
                 plot([t(t_p), t(t_p)], [rho(t(t_p)), -rho(t(t_p))], ':k');
             end
         end
@@ -125,7 +137,17 @@ function [] = plotter(varargin)
                 axes('position', [.675 .175 .2 .2]); 
                 box on;
                 hold on;
-                axis([0, max(t(t_p)), 1.1*min(u), 1.1*max(u)]);
+                ymin = min(u);
+                ymax = max(u);
+                
+                if ymin < 0, ymin = 1.1*ymin; 
+                else ymin = 0.9*ymin; end
+                
+                if ymax > 0, ymax = 1.1*ymax; 
+                else ymax = 0.9*ymax; end
+                
+                axis([0, max(t), ymin, ymax]);
+                axis([0, max(t(t_p)), ymin, ymax]);
                 plot(t(t_p), u(t_p), 'k')
             end
         end
