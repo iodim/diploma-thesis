@@ -2,20 +2,20 @@ clc; clear; close all;
 
 %% Parameters
 n = 1;
-x0 = ones(n, 1);
+x0 = zeros(n, 1);
 z0 = zeros(n, 1);
 q0 = [x0; z0];
 
-k = 1e5;
+k = 1e2;
 
-tol = 1e-6;
+tol = 1e-1;
 rbar = 1e3;
 rho0 = 3;
 rho = @(t) (rho0 - tol)*exp(-rbar*t) + tol;
 
 plant = @plant1a;
 
-tmax = 25;
+tmax = 0.02;
 ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6, ...
                      'OutputFcn', @odeprog,'Events', @odeabort);
 
@@ -26,7 +26,7 @@ controller = @(t, x, w) nocontrol();
 sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
-t_p = (t < peak);
+t_p = (t < 5*peak);
 
 % Reconstruct state estimates
 x = q(:, 1:n);
@@ -37,8 +37,9 @@ xhat = z;
 % Reconstruct sliding surface, its estimate and the control input
 s = x - xhat;
 
-plotter('t', t, 'x', x, 'xhat', xhat);
+plotter('t', t(t_p), 'x', x(t_p), 'xhat', xhat(t_p));
+plotter('t', t, 's', s, 'rho', rho);
 % save2tikz('../tex/reports/ppd/figures/ppd1a.tikz');
 
-plotter('t', t(t_p), 'x', x(t_p), 'xhat', xhat(t_p));
+% plotter('t', t(t_p), 'x', x(t_p), 'xhat', xhat(t_p));
 % save2tikz('../tex/reports/ppd/figures/ppd1a_zoom.tikz');
