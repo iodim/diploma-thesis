@@ -60,10 +60,10 @@ function [] = plotter(varargin)
             ymax = max(x(:, i));
             
             if ymin < 0, ymin = 1.1*ymin; 
-            else ymin = 0.9*ymin; end
+            else, ymin = 0.9*ymin; end
             
             if ymax > 0, ymax = 1.1*ymax; 
-            else ymax = 0.9*ymax; end
+            else, ymax = 0.9*ymax; end
                 
             axis([0, max(t), ymin, ymax]);
             plot(t, x(:, i), 'k');
@@ -77,6 +77,18 @@ function [] = plotter(varargin)
             if (rank == 4 && i >= 3) || (rank == 2 && i == 2)
                 xlabel('$t$', 'Interpreter', 'Latex');
             end
+            % Peaking plot
+            subplot_pos = get_subplot_pos(rank, i);
+            if plot_peak
+                axes('position', subplot_pos); 
+                box on;
+                hold on;
+                axis tight;
+                plot(t(t_p), x(t_p, i), 'k');
+                if plot_xhat
+                    plot(t(t_p), xhat(t_p, i), '--k');
+                end
+            end            
         end
     end
 
@@ -110,7 +122,7 @@ function [] = plotter(varargin)
 
             % Peaking plot
             if plot_peak
-                axes('position', [.675 .675 .2 .2]); 
+                axes('position', get_subplot_pos(2, 1)); 
                 box on;
                 hold on;
                 axis tight;
@@ -134,7 +146,7 @@ function [] = plotter(varargin)
 
             % Peaking plot
             if plot_peak
-                axes('position', [.675 .175 .2 .2]); 
+                axes('position', get_subplot_pos(2, 1)); 
                 box on;
                 hold on;
                 ymin = min(u);
@@ -154,3 +166,20 @@ function [] = plotter(varargin)
     end
 end
 
+function [pos] = get_subplot_pos(n, i)
+    switch n
+        case 1, pos = [.5 .5 .2 .2];
+        case 2
+            switch i
+                case 1, pos = [.675 .675 .2 .2];
+                case 2, pos = [.675 .200 .2 .2];
+            end
+        case 4
+            switch i
+                case 1, pos = [.200 .675 .2 .2];
+                case 2, pos = [.675 .675 .2 .2];
+                case 3, pos = [.200 .200 .2 .2];
+                case 4, pos = [.675 .200 .2 .2];
+            end
+    end
+end
