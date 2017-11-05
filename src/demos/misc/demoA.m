@@ -10,7 +10,7 @@ clc; clear; close all;
 
 %% Parameters
 k = 5;
-sat = 5;
+satlvl = 5;
 mu = 0.01;
 q0 = [1; -1];
 qhat0 = [0.8; 0];
@@ -29,9 +29,9 @@ tmax = 5;
 ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 
 %% Full state feedback
-controller1 = @(t, x, w) ppc(t, x, Lambda, rho1, k);
-controller2 = @(t, x, w) ppc(t, x, Lambda, rho2, k);
-controller3 = @(t, x, w) ppc(t, x, Lambda, rho3, k);
+controller1 = @(t, x, w) ppc_surf(t, x, Lambda, rho1, k);
+controller2 = @(t, x, w) ppc_surf(t, x, Lambda, rho2, k);
+controller3 = @(t, x, w) ppc_surf(t, x, Lambda, rho3, k);
 
 sys1 = @(t, q) control_loop(t, q, plant, [2 0 0], controller1);
 sys2 = @(t, q) control_loop(t, q, plant, [2 0 0], controller2);
@@ -89,22 +89,35 @@ suptitle('State feedback')
 %% High-Gain Observer
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
 
-controller1 = @(t, x, w) ppc_sat(t, x, Lambda, rho1, k, sat);
-controller2 = @(t, x, w) ppc_sat(t, x, Lambda, rho2, k, sat);
-controller3 = @(t, x, w) ppc_sat(t, x, Lambda, rho3, k, sat);
+controller1 = @(t, x, w) ppc_surf(t, x, Lambda, rho1, k);
+controller2 = @(t, x, w) ppc_surf(t, x, Lambda, rho2, k);
+controller3 = @(t, x, w) ppc_surf(t, x, Lambda, rho3, k);
 
-sys1 = @(t, q) control_loop(t, q, plant, [2 0 2], controller1, observer);
-sys2 = @(t, q) control_loop(t, q, plant, [2 0 2], controller2, observer);
-sys3 = @(t, q) control_loop(t, q, plant, [2 0 2], controller3, observer);
+sat1 = @(t, x, w) sat_control(t, x, controller1, satlvl);
+sat2 = @(t, x, w) sat_control(t, x, controller2, satlvl);
+sat3 = @(t, x, w) sat_control(t, x, controller3, satlvl);
+
+sys1 = @(t, q) control_loop(t, q, plant, [2 0 2], sat1, observer);
+sys2 = @(t, q) control_loop(t, q, plant, [2 0 2], sat2, observer);
+sys3 = @(t, q) control_loop(t, q, plant, [2 0 2], sat3, observer);
 
 [t1, q1] = ode15s(sys1, [0 tmax], [q0; qhat0], ode_options);
 [t2, q2] = ode15s(sys2, [0 tmax], [q0; qhat0], ode_options);
 [t3, q3] = ode15s(sys3, [0 tmax], [q0; qhat0], ode_options);
 
 % Control input reconstruction
-u1 = controller1(t1, q1(:, 3:4)');
-u2 = controller2(t2, q2(:, 3:4)');
-u3 = controller3(t3, q3(:, 3:4)');
+u1 = zeros(size(t1));
+u2 = zeros(size(t2));
+u3 = zeros(size(t3));
+for i = 1:length(t1)
+    u1(i) = sat1(t1(i), q1(i, 3:4)');
+end
+for i = 1:length(t2)
+    u2(i) = sat2(t2(i), q2(i, 3:4)');
+end
+for i = 1:length(t3)
+    u3(i) = sat3(t3(i), q3(i, 3:4)');
+end
 
 figure('Position', [450 300 800 400]);
 % r_bar = 0.5
@@ -124,7 +137,7 @@ subplot(3, 3, 2);
 subplot(3, 3, 3);
     hold on; box on;
     plot(t1, u1, 'k');
-    axis([0 tmax -1.1*sat 1.1*sat])
+    axis([0 tmax -1.1*satlvl 1.1*satlvl])
     title('$u(t)$', 'Interpreter', 'Latex')   
 
 % r_bar = 1
@@ -142,7 +155,7 @@ subplot(3, 3, 5);
 subplot(3, 3, 6);
     hold on; box on;
     plot(t2, u2, 'k');
-    axis([0 tmax -1.1*sat 1.1*sat])
+    axis([0 tmax -1.1*satlvl 1.1*satlvl])
 
 % r_bar = 2
 subplot(3, 3, 7);
@@ -161,6 +174,6 @@ subplot(3, 3, 8);
 subplot(3, 3, 9);
     hold on; box on;
     plot(t3, u3, 'k');
-    axis([0 tmax -1.1*sat 1.1*sat])
+    axis([0 tmax -1.1*satlvl 1.1*satlvl])
     xlabel('$t$', 'Interpreter', 'Latex');
 suptitle('Output feedback')    

@@ -31,8 +31,9 @@ ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 %% Cascade High-Gain Observer
 peak = 0.05;
 observer = @(t, z, y) chgo(t, z, y, alpha, mu, M);
-controller = @(t, x, w) ppc_sat(t, x, Lambda, rho, k, satlvl);
-dwell_controller = @(t, x, w) dwell_time_controller(t, x, controller, td);
+controller = @(t, x, w) ppc_surf(t, x, Lambda, rho, k);
+sat_controller = @(t, x, w) sat_control(t, x, controller, satlvl);
+dwell_controller = @(t, x, w) dwell_time_controller(t, x, sat_controller, td);
 sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], dwell_controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
@@ -53,7 +54,11 @@ end
 % Reconstruct sliding surface, its estimate and the control input
 s = x*Lambda;
 shat = xhat*Lambda;
-u = dwell_controller(t, xhat');
+
+u = zeros(size(t));
+for i = 1:length(t)
+    u(i) = dwell_controller(t(i), xhat(i, :)');
+end
 
 plotter('t', t, 'x', x, 's', s, 'rho', rho, 'u', u, 'xhat', xhat, ...
         'shat', shat, 'peak', peak);

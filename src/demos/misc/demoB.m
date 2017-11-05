@@ -34,7 +34,7 @@ ode_options = odeset('AbsTol', 1e-9, 'RelTol', 1e-6);
 %% Cascade High-Gain Observer
 peak = 0.05;
 observer = @(t, z, y) chgo(t, z, y, alpha, mu, M);
-controller = @(t, x, w) ppc(t, x, Lambda, rho, k);
+controller = @(t, x, w) ppc_surf(t, x, Lambda, rho, k);
 sys1 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
 
 [t, q] = ode15s(sys1, [0 tmax], q0, ode_options);
@@ -66,8 +66,9 @@ satlvl = 15;
 alpha = [4, 6, 4, 1];
 
 observer = @(t, xhat, y) hgo(t, xhat, y, alpha, mu);
-controller = @(t, x, w) ppc_sat(t, x, Lambda, rho, k, satlvl);
-sys2 = @(t, q) control_loop(t, q, plant, [n 0 n], controller, observer);
+controller = @(t, x, w) ppc_surf(t, x, Lambda, rho, k);
+sat_controller = @(t, x, w) sat_control(t, x, controller, satlvl);
+sys2 = @(t, q) control_loop(t, q, plant, [n 0 n], sat_controller, observer);
 
 [t, q] = ode15s(sys2, [0 tmax], q0, ode_options);
 t_p = (t < peak);
@@ -78,7 +79,10 @@ xhat = q(:, n+1:end);
 
 s = x*Lambda;
 shat = xhat*Lambda;
-u = controller(t, xhat');
+u = zeros(size(t));
+for i = 1:length(t)
+    u(i) = sat_controller(t(i), xhat(i, :)');
+end
 
 plotter('t', t, 'x', x, 's', s, 'rho', rho, 'u', u, 'xhat', xhat, ...
         'shat', shat, 'peak', peak);

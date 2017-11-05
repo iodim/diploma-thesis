@@ -24,7 +24,7 @@ rho_c = @(t) (rho_0_c - rho_inf_c)*exp(-rbar_c*t) + rho_inf_c;
 
 plant = @plant2;
 
-tmax = 5;
+tmax = 50;
 ode_options = odeset('AbsTol', 1e-12, 'RelTol', 1e-9, ...
                      'OutputFcn', @odeprog,'Events', @odeabort);
 

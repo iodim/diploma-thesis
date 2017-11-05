@@ -26,7 +26,8 @@ function [dz, xhat] = ppd2a(t, z, y, rho, k, t_p)
 
     xhat = z;
     if any(imag(z) ~= 0)
-        close(95)
-%         error(['Escaped performance bounds at t = ' num2str(t)]);
+%         close(95)
+        close all
+        warning(['Escaped performance bounds at t = ' num2str(t)]);
     end
 end
