@@ -1,5 +1,5 @@
 function [u, dw] = ppc_surf(t, x, Lambda, rho, k)
-%PPC Prescribed Perfomance Controller implementation.
+%PPC_SURF Prescribed Perfomance Controller implementation.
 %
 %   See more:
 %   Bechlioulis, Charalampos P., Achilles Theodorakopoulos, and George A. 
