@@ -1,0 +1,47 @@
+% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
+
+\documentclass[a4paper,12pt,final,oneside]{memoir}
+
+\input{preamble}
+
+\begin{document}
+    \selectlanguage{greek}
+    
+    \frontmatter
+    \include{titlepage}
+    \cleardoublepage
+    
+    \include{chapters/dedication}
+    \cleardoublepage
+    
+    \include{chapters/abstractGR}
+    \cleardoublepage
+    
+    \include{chapters/abstractEN}
+    \cleardoublepage
+    
+    \include{chapters/acknowledgements}
+    \cleardoublepage
+    
+    \tableofcontents
+    \cleardoublepage
+    
+    \listoffigures
+    \cleardoublepage
+    
+    \mainmatter
+    \include{chapters/intro}
+    \include{chapters/ppc}
+    \include{chapters/hgo}
+    \include{chapters/surface}
+    \include{chapters/simulations}
+    \include{chapters/conclusions}
+    
+    \backmatter
+    \appendix
+    \include{chapters/appendix}
+
+    \selectlanguage{english}
+    \printbibliography[title=\textgreek{Αναφορές}]
+\end{document}
+

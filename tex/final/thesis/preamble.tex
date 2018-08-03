@@ -1,0 +1,161 @@
+% Encoding
+\usepackage[T1,LGR]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,greek]{babel}
+
+% Custom width
+\newlength{\alphabet}
+\settowidth{\alphabet}{\normalfont abcdefghijklmnopqrstuvwxyz}
+\usepackage{geometry}
+\geometry{textwidth=2.75\alphabet, lines=43}
+
+% Fonts
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage[p,osf]{libertine}
+\usepackage{libertinegc}
+%\usepackage[libertine]{newtxmath}
+\usepackage{libertinust1math}
+\usepackage{newtxtt}
+
+% Useful packages
+\usepackage{csquotes}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{siunitx}
+\usepackage{xfrac}
+\usepackage[inline]{enumitem}
+
+\DisemulatePackage{setspace}
+\usepackage{setspace}
+
+\renewcommand{\theenumi}{\roman{enumi}}%
+
+% Graphics
+\usepackage{graphicx}
+\graphicspath{ {figures/} {../figures/} }
+\usepackage{pgfplots}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows.meta}
+\usepgfplotslibrary{patchplots}
+\usepgfplotslibrary{fillbetween}
+
+\usetikzlibrary{external}
+\tikzexternalize[prefix=figures/externalize/]
+
+\pgfplotsset{compat=newest}
+\pgfplotsset{ylabel absolute}
+\pgfplotsset{plot coordinates/math parser=false}
+
+\usepackage{grffile}
+
+% References
+\usepackage[hidelinks,unicode]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage[backend=biber,
+            style=numeric-comp,
+            sorting=none,
+            hyperref=true,
+            url=false,
+            isbn=false,
+            backref=true]{biblatex}
+\addbibresource{references.bib}
+
+% Figure width and height
+\newlength{\figurewidth}
+\newlength{\figureheight}
+\setlength{\figurewidth}{0.8\textwidth}
+\setlength{\figureheight}{0.45\textwidth}
+
+% Remove δεξία κεραία from \alph enumerators
+\renewcommand{\textdexiakeraia}{}
+\renewcommand{\textstigma}{\textsigma\texttau}
+
+% Formatting 
+\chapterstyle{veelo}
+\setlength{\headwidth}{\textwidth}
+\addtolength{\headwidth}{\marginparsep}
+\addtolength{\headwidth}{\marginparwidth}
+\pagestyle{companion}
+
+% Do not let parskip rubbering
+\setlength{\parskip}{0pt}
+\usepackage[bottom]{footmisc} 
+
+% Abstract options
+\setlength{\absleftindent}{0pt}
+\setlength{\absrightindent}{0pt}
+\abstractnum
+\renewcommand{\abstracttextfont}{\normalsize}
+
+% Add aknowledgements section
+\newenvironment{acknowledgments}
+{\renewcommand{\abstractname}{Ευχαριστίες}\abstract}
+{\endabstract}
+
+% Custom commands
+\DeclareSIUnit{\rad}{rad}
+\DeclareMathOperator{\sat}{sat}
+\DeclareMathOperator{\col}{col}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\bdiag}{blockdiag}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rho}{\mathrm{P}}
+\newcommand{\ddt}{\left(\mathrm{d}/ \mathrm{d} t \right)}
+\newcommand\T{{\mathpalette\raiseT\intercal}}
+\newcommand\raiseT[2]{\raisebox{0.45ex}{$#1#2$}}  
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\newcommand{\bigo}[1]{\mathcal{O}\pqty{#1}}
+
+% Text macros
+%\newcommand{\hgo}{\emph{high gain observer}}
+\newcommand{\lip}{\textlatin{Lipschitz}}
+\newcommand{\hur}{\textlatin{Hurwitz}}
+\newcommand{\lyap}{\textlatin{Lyapunov}}
+
+% Theorems
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{lemma}{Λήμμα}
+\newtheorem{theorem}{Θεώρημα}
+\newtheorem{remark}{Παρατήρηση}
+\newtheorem{assumption}{Υπόθεση}
+\newtheorem{definition}{Ορισμός}
+\newtheorem{proposition}{Πρόταση}
+\newtheorem{convention}{Σύμβαση}
+\newtheorem{property}{Ιδιότητα}
+
+% cleveref localisation
+\Crefname{equation}{}{}
+\Crefname{remark}{Παρατήρηση}{Παρατηρήσεις}
+\Crefname{proposition}{Πρόταση}{Προτάσεις}
+\Crefname{lemma}{Λήμμα}{Λήμματα}
+\Crefname{theorem}{Θεώρημα}{Θεωρήματα}
+\Crefname{figure}{Σχήμα}{Σχήματα}
+\Crefname{table}{Πίνακας}{Πίνακες}
+\Crefname{chapter}{Κεφάλαιο}{Κεφάλαια}
+\Crefname{section}{Ενότητα}{Ενότητες}
+\Crefname{assumption}{Υπόθεση}{Υποθέσεις}
+
+\newcommand{\crefrangeconjunction}{--}%
+\newcommand{\crefpairconjunction}{ και\nobreakspace}%
+\newcommand{\creflastconjunction}{ και\nobreakspace}%
+\newcommand{\crefpairgroupconjunction}{ και\nobreakspace}%
+\newcommand{\creflastgroupconjunction}{, και\nobreakspace}%
+
+\DefineBibliographyStrings{english}{%
+    backrefpage  = {see p.}, % for single page number
+    backrefpages = {see pp.} % for multiple page numbers
+}
+
+\sisetup{
+    list-final-separator = { και },
+    list-pair-separator  = { και },
+    range-phrase         = { ως },
+}
+
+% Hyphenation quick fixes
+\babelhyphenation[greek]{εί-ναι εί-χε ού-τως υπό ιδι-αί-τε-ρα οποί-ες %
+    οποί-ος τρο-χιάς α-πο-τε-λού-νται ι-δι-ό-τη-τα μπο-ρού-με}

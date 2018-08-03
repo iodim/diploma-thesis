@@ -48,10 +48,11 @@ function [] = plotter(varargin)
 
     % Plot states and their estimates
     if plot_x
-        figure();
+        figure('Position', [0 0 300 200]);
         for i = 1:rank
-            if rank == 2, subplot(2, 1, i);
-            elseif rank == 4, subplot(2, 2, i);
+            if rank == 2, subplot_tight(2, 1, i);
+            elseif rank == 3, subplot_tight(3, 1, i);
+            elseif rank == 4, subplot_tight(2, 2, i);
             end
             box on; 
             hold on; 
@@ -75,12 +76,14 @@ function [] = plotter(varargin)
                 ylabel(['$x_' num2str(i) '(t)$'], 'Interpreter', 'Latex');
             end
             if (rank == 4 && i >= 3) || (rank == 2 && i == 2)
-                xlabel('$t$', 'Interpreter', 'Latex');
+                xlabel('Time, $t$', 'Interpreter', 'Latex');
+            else
+                set(gca,'XTick',[])
             end
             % Peaking plot
-            subplot_pos = get_subplot_pos(rank, i);
             if plot_peak
-                axes('position', subplot_pos); 
+                subplot_tight_pos = get_subplot_tight_pos(rank, i);
+                axes('position', subplot_tight_pos); 
                 box on;
                 hold on;
                 axis tight;
@@ -90,14 +93,15 @@ function [] = plotter(varargin)
                 end
             end            
         end
+        tightfig;
     end
 
     % Plot surface and/or control input
     if plot_s || plot_u
-        figure();
+        figure('Position', [0 0 300 200]);
 
-        % If there are two plots, then create the appropriate subplots
-        if plot_s && plot_u, subplot(2, 1, 1); end
+        % If there are two plots, then create the appropriate subplot_tights
+        if plot_s && plot_u, subplot_tight(2, 1, 1); end
 
         if plot_s
             box on;
@@ -118,11 +122,15 @@ function [] = plotter(varargin)
 
             % Check if there is another plot below, in order to know where
             % to put the x-label
-            if ~(plot_s && plot_u), xlabel('$t$', 'Interpreter', 'Latex'); end
+            if ~(plot_s && plot_u)
+                xlabel('Time, $t$', 'Interpreter', 'Latex');
+            else
+                set(gca,'XTick',[])
+            end
 
             % Peaking plot
             if plot_peak
-                axes('position', get_subplot_pos(2, 1)); 
+                axes('position', get_subplot_tight_pos(2, 1)); 
                 box on;
                 hold on;
                 axis tight;
@@ -135,38 +143,39 @@ function [] = plotter(varargin)
         end
 
         % If there are two plots, then create the appropriate subfigures
-        if plot_s && plot_u, subplot(2, 1, 2); end
+        if plot_s && plot_u, subplot_tight(2, 1, 2); end
 
         if plot_u
             box on;
             hold on;
             plot(t, u, 'k')
             ylabel('$u(t)$', 'Interpreter', 'Latex');
-            xlabel('$t$', 'Interpreter', 'Latex');
+            xlabel('Time, $t$', 'Interpreter', 'Latex');
 
             % Peaking plot
             if plot_peak
-                axes('position', get_subplot_pos(2, 1)); 
+                axes('position', get_subplot_tight_pos(2, 2)); 
                 box on;
                 hold on;
                 ymin = min(u);
                 ymax = max(u);
                 
                 if ymin < 0, ymin = 1.1*ymin; 
-                else ymin = 0.9*ymin; end
+                else, ymin = 0.9*ymin; end
                 
                 if ymax > 0, ymax = 1.1*ymax; 
-                else ymax = 0.9*ymax; end
+                else, ymax = 0.9*ymax; end
                 
                 axis([0, max(t), ymin, ymax]);
                 axis([0, max(t(t_p)), ymin, ymax]);
                 plot(t(t_p), u(t_p), 'k')
             end
         end
+        tightfig;
     end
 end
 
-function [pos] = get_subplot_pos(n, i)
+function [pos] = get_subplot_tight_pos(n, i)
     switch n
         case 1, pos = [.5 .5 .2 .2];
         case 2

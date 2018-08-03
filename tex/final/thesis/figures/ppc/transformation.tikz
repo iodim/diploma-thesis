@@ -1,0 +1,58 @@
+\tikzstyle{every node}=[font=\footnotesize]
+\pgfplotsset{every tick/.style={draw=none}}
+
+\begin{tikzpicture}
+\begin{axis}[%
+    width=0.43\figurewidth,
+    height=\figureheight,
+    at={(0\figurewidth,0\figureheight)},
+    scale only axis,
+    xmin=-0.45,
+    xmax=1.1,
+    ylabel near ticks,
+    ymin=-5,
+    ymax=5,
+    ylabel style={font=\color{white!15!black}},
+    ytick = {0},
+    xtick = {-0.35, 0, 1},
+    xticklabels = {$-M_i$, $0$, $1$},
+    xlabel = {$\flatfrac{e_i}{\rho_i}$},
+    ylabel = {$T_i \pqty{\flatfrac{e_i}{\rho_i}}$},
+    axis background/.style={fill=white},
+    legend style={legend cell align=left, align=left, draw=white!15!black},
+    xlabel style={font=\footnotesize},ylabel style={font=\footnotesize},ticklabel style={font=\scriptsize},x tick label style={font=\scriptsize},y tick label style={font=\scriptsize},legend style={font=\scriptsize}
+]
+\addplot [black, domain=-1:1, samples=501] {ln((0.35+x)/(1-x))};
+\addplot [black, dashed] coordinates {(1,-7.5) (1,7.5)};
+\addplot [black, dashed] coordinates {(-0.35,-7.5) (-0.35,7.5)};
+\addplot [black, dotted] coordinates {(0,-5) (0,5)};
+\addplot [black, dotted] coordinates {(-1.1,0) (1.1,0)};
+\end{axis}
+
+\begin{axis}[%
+    width=0.43\figurewidth,
+    height=\figureheight,
+    at={(0.57\figurewidth,0\figureheight)},
+    scale only axis,
+    xmin=-1.1,
+    xmax=0.45,
+    ymin=-5,
+    ymax=5,
+    ylabel near ticks,
+    ylabel style={font=\color{white!15!black}},
+    ytick = {0},
+    xtick = {-1, 0, 0.35},
+    xticklabels = {$-1$, $0$, $M_i$},
+    xlabel = {$\flatfrac{e_i}{\rho_i}$},
+    ylabel = {$T_i \pqty{\flatfrac{e_i}{\rho_i}}$},
+    axis background/.style={fill=white},
+    legend style={legend cell align=left, align=left, draw=white!15!black},
+    xlabel style={font=\footnotesize},ylabel style={font=\footnotesize},ticklabel style={font=\scriptsize},x tick label style={font=\scriptsize},y tick label style={font=\scriptsize},legend style={font=\scriptsize}
+]
+\addplot [black, domain=-1:1, samples=501] {ln((1+x)/(0.35-x))};
+\addplot [black, dashed] coordinates {(-1,-7.5) (-1,7.5)};
+\addplot [black, dashed] coordinates {(0.35,-7.5) (0.35,7.5)};
+\addplot [black, dotted] coordinates {(0,-5) (0,5)};
+\addplot [black, dotted] coordinates {(-1.1,0) (1.1,0)};
+\end{axis}
+\end{tikzpicture}

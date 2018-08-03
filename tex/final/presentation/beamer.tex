@@ -1,0 +1,681 @@
+% !TeX TXS-program:compile = txs:///pdflatex/[--shell-escape]
+\documentclass{beamer}
+
+\usetheme{Madrid}
+%\usecolortheme{beaver}
+\usefonttheme{serif}
+
+\definecolor{myblue}{RGB}{33,84,157}
+\definecolor{maroon}{RGB}{128, 0, 0}
+
+%\setbeamercolor*{structure}{bg=myblue!20,fg=myblue}
+\setbeamercolor*{structure}{bg=maroon,fg=maroon}
+
+\setbeamerfont{title}{series=\bfseries}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamertemplate{footline}[frame number]{}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[triangle]
+
+\usepackage{enumerate}
+%\setbeamertemplate{enumerate item}{(\roman{enumii})}
+
+\usepackage[T1,LGR]{fontenc}
+\usepackage[utf8]{inputenx}
+\usepackage[english,greek]{babel}
+
+\usepackage[activate={true,nocompatibility},final,tracking=true,kerning=true,spacing=true,factor=1100,stretch=10,shrink=10]{microtype}
+\usepackage[p,proportional]{libertine}
+\usepackage{libertinegc}
+\usepackage[libertine]{newtxmath}
+%\usepackage{libertinust1math}
+\usepackage{newtxtt}
+
+\usepackage{appendixnumberbeamer}
+
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{csquotes}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage{siunitx}
+\usepackage{xfrac}
+%\usepackage[inline]{enumitem}
+
+\usepackage{graphicx}
+\graphicspath{ {figures/} {../figures/} }
+\usepackage{pgfplots}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows.meta}
+\usepgfplotslibrary{patchplots}
+\usepgfplotslibrary{fillbetween}
+
+%\usetikzlibrary{external}
+%\tikzexternalize[prefix=figures/externalize/]
+
+\pgfplotsset{compat=newest}
+%\pgfplotsset{ylabel absolute}
+\pgfplotsset{plot coordinates/math parser=false}
+\tikzset{every picture/.style=semithick}
+
+\newlength{\figurewidth}
+\newlength{\figureheight}
+\setlength{\figurewidth}{0.8\textwidth}
+\setlength{\figureheight}{0.45\textwidth}
+
+\DeclareSIUnit{\rad}{rad}
+\DeclareMathOperator{\sat}{sat}
+\DeclareMathOperator{\col}{col}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\bdiag}{bdiag}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rho}{\mathrm{P}}
+\newcommand{\ddt}{\left(\mathrm{d}/ \mathrm{d} t \right)}
+\newcommand\T{{\mathpalette\raiseT\intercal}}
+\newcommand\raiseT[2]{\raisebox{0.45ex}{$#1#2$}}  
+\usepackage{accents}
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+\newcommand{\bigo}[1]{\mathcal{O}\pqty{#1}}
+
+\makeatletter
+\newcommand\libertineTLF{\def\libertine@figurealign{T}\libertineLF}
+% \newcommand\libertinePLF{\def\libertine@figurealign{}\libertineLF}    %% not needed
+\newcommand\libertineTOsF{\def\libertine@figurealign{T}\libertineOsF}
+\newcommand\libertinePOsF{\def\libertine@figurealign{}\libertineOsF}
+\makeatother
+
+\AtBeginDocument{\libertinePOsF}
+
+\title{Παρακολούθηση τροχιάς με ανάδραση εξόδου και προδιαγεγραμμένη απόκριση για αβέβαια ΠΕΠΕ μη-γραμμικά συστήματα}
+
+\author{{\large Ιωάννης Δημανίδης}\\ Επιβλέπων: Γεώργιος Ροβιθάκης}
+
+\institute[ΑΠΘ]{ΑΡΙΣΤΟΤΕΛΕΙΟ ΠΑΝΕΠΙΣΤΗΜΙΟ ΘΕΣΣΑΛΟΝΙΚΗΣ\\
+                Τμήμα Ηλεκτρολογων Μηχανικών \& Μηχανικών Υπολογιστών}
+            
+\titlegraphic{\includegraphics[width=1.75cm]{authlogo}}
+            
+\date{14 Μαΐου 2018}
+\begin{document}
+    
+    \frame{\titlepage}
+        
+    \begin{frame}
+        \frametitle{Εισαγωγή}
+        Ο έλεγχος μη-γραμμικών συστημάτων αποτελεί ένα αντικείμενο με έντονο ερευνητικό ενδιαφέρον.\\~\
+        
+        \pause
+        Τα περισσότερα σχήματα ελέγχου δεν προσφέρουν εγγυήσεις για την απόκριση του σφάλματος (π.χ. χρόνος σύγκλισης).\\~\
+        
+        \pause
+        Δύο μεγάλες οικογένειες ελεγκτών ικανές να προδιαγράψουν χαρακτηριστικά απόκρισης του σφάλματος:
+        \begin{itemize}
+            \item \textlatin{Funnel control (FC)} 
+            \item \textlatin{Prescribed performance control (PPC)}
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{\textlatin{Funnel control}}
+        Προτάθηκε πρώτη φορά στην εργασία [1] και αφορούσε μη-γραμμικά συστήματα σχετικής τάξης ένα.\\~\
+        
+        \pause
+        Στην εργασία [2] μέσω μίας \textlatin{backstepping} διαδικασίας επεκτάθηκε για αυθαίρετη σχετική τάξη.
+        \pause
+        \begin{itemize}
+            \item Υπερβολικά πολύπλοκος ελεγκτής - δεν μπορεί να εφαρμοστεί σε πραγματικά προβλήματα.
+        \end{itemize}~\
+    
+        \pause
+        Σχήματα ελέγχου με \textlatin{FC} έχουν προταθεί [3, 7] που μπορούν να έχουν ρεαλιστικές εφαρμογές.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{\textlatin{Prescribed performance control}}
+        Προτάθηκε πρώτη φορά στην εργασία [9] για γραμμικοποιήσιμα μέσω ανάδρασης, ΠΕΠΕ μη-γραμμικά συστήματα .\\~\
+        
+        \pause
+        Οι πρώτες εργασίες [9, 12, 14] χρησιμοποιούσαν δομές αναγνώρισης, συνεπώς το σχήμα ελέγχου ήταν περίπλοκο.\\~\
+        
+        \pause
+        Αργότερα, εργασίες όπως οι [10, 11, 13] απλοποίησαν τη σχεδίαση, εξαλείφοντας την ανάγκη για δομές νευρωνικών δικτύων.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{\textlatin{Prescribed performance control}}   
+        Συνάρτηση επίδοσης $\rho(t)$ ονομάζουμε μία φραγμένη, θετική γνησίως φθίνουσα συνάρτηση με $\lim_{t \rightarrow \infty} \rho(t) > 0$.
+        \begin{itemize}
+            \item π.χ. $\rho(t) = (\rho_\infty - \rho_0) \exp(-\lambda t) + \rho_\infty$
+        \end{itemize}~\
+    
+        \pause
+        Έστω μία ομαλή και γνησίως αύξουσα απεικόνιση $T:(-1, 1) \rightarrow \mathbb R$.
+        \begin{itemize}
+            \item π.χ. $Τ(\star) = \ln\pqty{\flatfrac{(1+\star)}{(1-\star)}}$
+        \end{itemize}~\
+    
+        \pause
+        Έστω ένα σφάλμα παρακολούθησης εξόδου $e(\;\!\!t)$.\\~\
+        
+        \pause
+        Ορίζουμε το κανονικοποιημένο σφάλμα $\flatfrac{e(t)}{\rho(t)}$.\\~\
+    
+        \pause
+        \textbf{Πρόταση:} Αν $\varepsilon = T(\flatfrac{e(t)}{\rho(t)}) \in \mathcal L_\infty$, τότε $\abs{e(t)} < \rho(t)$
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Προδιαγεγραμμένη απόκριση με ανάδραση εξόδου}
+
+        \textlatin{Funnel control}:
+        \begin{itemize}
+            \item Η εργασία [2] αφορά αβέβαια, ΠΕΠΕ, μη-γραμμικά συστήματα με μη-τετριμμένες εσωτερικές δυναμικές. Μη-πρακτικό σε πραγματικά προβλήματα.
+            \item Η εργασία [7] αφορά ΜΕΜΕ μη-γραμμικά συστήματα με μη-τετριμμένες εσωτερικές δυναμικές. Απαιτεί μερική γνώση των μη-γραμμικοτήτων.
+        \end{itemize}~\
+        
+        \pause
+        \textlatin{Prescribed performance control}:
+        \begin{itemize}
+            \item Οι εργασίες [21, 22] απαιτούν δομές νευρωνικών δικτύων - περίπλοκη υλοποίηση.
+            \item Η εργασία [23] πετυχαίνει \emph{σταθεροποίηση} ΜΕΜΕ μη-γραμμικών συστημάτων, με τετριμμένες εσωτερικές δυναμικές.
+        \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Σκοπός της διπλωματικής}
+        Η διπλωματική αυτή αποτελεί επέκταση της εργασίας [23].\\~\
+        
+        \pause
+        Αφορά αβέβαια, ΠΕΠΕ, μη-γραμμικά συστήματα, υψηλής σχετικής τάξης, με μη-τετριμμένες εσωτερικές δυναμικές, παρουσία εξωτερικών διαταραχών.\\~\
+        
+        \pause
+        Χρησιμοποιούμε τεχνικές \textlatin{prescribed performance control} και παρατηρητές υψηλού κέρδους (\textlatin{high-gain observers}) για να επιτύχουμε σύγκλιση του σφάλματος παρακολούθησης εξόδου με προεπιλεγμένο ρυθμό σε μια προαποφασισμένη περιοχή του μηδενός.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Παρατηρητές υψηλού κέρδους}
+        Χρησιμοποιούνται για την σχεδίαση ελεγκτών ανάδρασης εξόδου.\\~\
+        
+        \pause
+        Πετυχαίνουν ανακατασκευή των μη-διαθέσιμων καταστάσεων από μετρήσεις της εξόδου.\\~\
+        
+        \pause
+        Λειτουργούν σε διαφορετική (ταχύτερη) χρονική κλίμακα από το ελεγχόμενο σύστημα.\\~\
+        
+        \pause
+        Χρησιμοποιούμε τις εκτιμήσεις που παράγει ο παρατηρητης σε ένα ελεγκτή ανάδρασης καταστάσεων, μετατρέποντάς τον σε ελεγκτή ανάδρασης εξόδου.
+        
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Παρατηρητές υψηλού κέρδους}
+        Λόγω της ταχύτερης χρονικής κλίμακας, οι εκτιμήσεις που παράγει ο παρατηρητής, εμφανίζουν πολύ έντονο (και πολύ σύντομο) μεταβατικό, γνωστό και ως φαινόμενο κορύφωσης.\\~\
+        
+        \pause
+        Αυτή η σχεδόν-κρουστική συμπεριφορά οδηγεί σε σμίκρυνση της περιοχής έλξης και ενδεχομένως σε αστάθεια του κλειστού βρόχου.\\~\
+        
+        \pause
+        Ένας τρόπος αντιμετώπισης είναι ο κορεσμός του ελεγκτή που χρησιμοποιεί τις εκτιμήσεις των καταστάσεων, αποτρέποντας έτσι τη μετάδοση του φαινομένου κορύφωσης στο σύστημα υπό έλεγχο.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Παρατηρητές υψηλού κέρδους}
+        Έστω το μη-γραμμικό σύστημα:
+        \[\tag{Σ}\begin{split}
+            \dot x &= A x +  B f(x, u, w, d)\\
+            y &= Cx
+        \end{split}\]
+        με $(A, B, C)$ να αναπαριστούν $m$ αλληλουχίες ολοκληρωτών.\\~\
+        
+        \pause
+        Έστω ο \emph{ολικά φραγμένος} στο $x$ νόμος ελέγχου $u = \gamma(x, w)$ που εγγυάται ασυμπτωτική σύγκλιση στην αρχή των αξόνων.\\~\
+        
+        \pause
+        Έστω και ο παρατηρητής υψηλού κέρδους:
+        \[
+            \dot{\hat{x}} = A \hat x + B \hat f(\hat x, u, w) + H(y - C\hat x)
+        \]
+        με $Η = \mathrm{bdiag}(H_1, \ldots, H_m)$, $H_i = \mathrm{col}(\flatfrac{\eta_1^i}{\mu},\ldots, \flatfrac{\eta_{r_i}^i}{\mu^{r_i}})$, και $A-HC$ \textlatin{Hurwitz}.
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Παρατηρητές υψηλού κέρδους}
+        Ορίζουμε το σύστημα των σφαλμάτων εκτίμησης:
+        \[\tag{Π}
+            \dot{\tilde x} = (A - HC) \tilde x + B \delta(x, \tilde x, w, d)
+        \]
+        με $\delta(x, \tilde x, w, d) = f(x, u, w, d) - \hat f(\hat x, u, w)$.\\~\
+    
+        \pause
+        \textbf{Πρόταση:} Για οποιοδήποτε, ολικά φραγμένο στο $x$, νόμο ελέγχου $u = \gamma(x, w)$, που να μπορεί να πετύχει ασυμπτωτική σύγκλιση του συστήματος (Σ) στο μηδέν, θα υπάρχει ένα $0 < \bar\mu < 1$ τέτοιο ώστε, για κάθε σταθερά κλιμάκωσης χρόνου $\mu \in (0, \bar \mu)$, το επαυξημένο σύστημα (Σ)--(Π) με τον νόμο ελέγχου $u = \gamma(\hat x, w)$ να έχει ασυμπτωτικά ευσταθή αρχή των αξόνων.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Ορισμός του προβλήματος - Κλάση συστημάτων}
+        
+        Θεωρούμε ένα μη-γραμμικό σύστημα ΠΕΠΕ, τάξης $n$, με $m$ εισόδους και $m$ εξόδους, στην κανονική μορφή \textlatin{Byrnes-Isidori} [30, 31] με ομοιόμορφο σχετικό βαθμό $\{ r_1, \ldots, r_m \}$: 
+        \begin{equation}
+            \tag{Σ\textsubscript{1}}
+            \begin{split}
+            \dot z &= f_0(z, x, d)\\
+            \dot x &= A x +  B \pqty{f(z, x, d) + G(z, x, d) u}\\
+            y &= Cx
+            \end{split}
+        \end{equation}
+        όπου $x \in \mathbb R^r$, $r = r_1 + \cdots + r_m$, $z \in \mathbb R^{n-r}$, $u \in \mathbb R^m$ η είσοδος ελέγχου, $y \in \mathbb R^m$ η μετρήσιμη έξοδος, $(A, B, C)$ αναπαριστούν $m$ αλληλουχίες  ολοκληρωτών, και $d:\mathbb R_+ \rightarrow \mathbb R^p$ ένα διάνυσμα φραγμένων εξωτερικών διαταραχών. Επίσης, $f_0: \mathbb R^{n-r} \times \mathbb R^{r} \times \mathbb R^p \rightarrow \mathbb R^{n-r}$, $f: \mathbb R^{n-r} \times \mathbb R^{r} \times \mathbb R^p \rightarrow \mathbb R^{m}$ διανυσματικά πεδία, και $G: \mathbb R^{n-r} \times \mathbb R^{r} \times \mathbb R^p \rightarrow \mathbb R^{m\times m}$ πίνακας, τοπικά \textlatin{Lipschitz} στα ορίσματά τους.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Ορισμός του προβλήματος - Υποθέσεις}
+        
+        \textbf{Υπόθεση 1:} Ο πίνακας $G_s(z, x, d)$ είναι θετικά (ή αρνητικά) ορισμένος, όπου $G_s$ το συμμετρικό κομμάτι του $G$.\\~\
+        
+        \textbf{Υπόθεση 2:} Οι τροχιές αναφοράς $y_d^i(t)$, $i = 1, \ldots, m$, είναι μετρήσιμες και φραγμένες συναρτήσεις του χρόνου, που ανήκουν στη κλάση $\mathcal C^{r_i}$, και οι παράγωγοί τους μέχρι τάξης $r_i$ είναι άγνωστες αλλά φραγμένες. Όμως, απαιτείται επίγνωση του συνόλου $Y_0^i \subset \R^{r_i}$, στο εσωτερικό του οποίου ανήκει το διάνυσμα $\pqty{y_d^i(0), \ldots, (\dv*{}{t})^{r_i} y_d^i(0)}$.\\~\
+    
+        \textbf{Υπόθεση 3:} Μόνο το διάνυσμα εξόδου $y$ και καμία από τις καταστάσεις, $x$, $z$, είναι διαθέσιμο προς μέτρηση.
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Ορισμός του προβλήματος - Υποθέσεις}
+    
+        \textbf{Υπόθεση 4:} Οι $x$-καταστάσεις αρχικοποιούνται εντός ενός γνωστού συμπαγούς συνόλου $X_0 \subset \R^r$. Αντιθέτως, για τις $z$-καταστάσεις, απαιτείται μονάχα η ύπαρξη ενός συμπαγούς συνόλου αρχικοποίησης $Z_0 \subset \R^{n-r}$.\\~\
+        
+        \textbf{Υπόθεση 5:} Η εσωτερική δυναμική χαρακτηρίζεται από ευστάθεια φραγμένης-εισόδου-φραγμένων-καταστάσεων (\textlatin{BIBS}) ως προς το $x(t)$ και $d(t)$, που σημαίνει ότι υπάρχει μια συνάρτηση $\pi$, κλάσης $\mathcal{K}$, και μια θετική σταθερά $\gamma$, ώστε να ικανοποιείται η ακόλουθη ανισοτική σχέση:
+        \begin{equation*}
+        \label{eq:bibs}                
+        \norm{z(t)} \leq \gamma + \pi\pqty{\norm{\chi(t)}},\ \forall t \in \R_+,
+        \end{equation*}
+        όπου $\chi(t) = \col(x(t), d(t))$.
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Ορισμός του προβλήματος}
+    
+        \textbf{Πρόβλημα Έλεγχου Προδιαγεγραμμένης Απόκρισης με Ανάδραση Εξόδου (ΕΠΑΑΕ):} Θεωρούμε συστήματα της μορφής (Σ\textsubscript{1}) που έχουν άγνωστες μη-γραμμικότητες, τοπικά \textlatin{Lipschitz} στα ορίσματά τους και τις Υποθέσεις 1--5. Θα σχεδιάσουμε έναν ελεγκτή, χωρίς εσωτερικό μοντέλο του συστήματος, που με χρήση μόνο ανάδρασης εξόδου θα μπορεί να πετύχει τις ακόλουθες ιδιότητες: 
+        \begin{enumerate}[I.]%[label=(\roman*)]
+            \pause
+            \item όλα τα σήματα του κλειστού βρόχου θα είναι φραγμένα για κάθε $t \geq 0$ 
+            \pause
+            \item τα σφάλματα παρακολούθησης εξόδου $e_1^i = y_i - y_d^i(t)$, $i = 1,\ldots, m$, θα συγκλίνουν τουλάχιστον $\exp(-\lambda_i t)$ εκθετικά γρήγορα σε μία περιοχή του μηδενός $E_i = \qty{e_1^i \in \R: |e_1^i| < e^i_\infty}$, με $e_\infty^i = \rho^i_\infty/\prod_{j=1}^{r_i - 1} b_j^i$,  όπου $\lambda_i >0$, $\rho_\infty^i >0$, και $b_j^i>0$, $i = 1,\ldots, m$, $j = 1, \ldots, r_i - 1$ είναι προεπιλεγμένες σταθερές.
+        \end{enumerate}
+    \end{frame}
+   
+    \begin{frame}
+        \frametitle{Φιλοσοφία σχεδίασης}
+        
+        Κάνουμε προσωρινά την υπόθεση πως το διάνυσμα των $x$-καταστάσεων είναι διαθέσιμο προς μέτρηση. Σχεδιάζουμε έναν ελεγκτή ανάδρασης καταστάσεων, ικανό να πετύχει τις επιθυμητές προδιαγραφές απόκρισης στα σφάλματα παρακολούθησης.\\~\
+        
+        \pause
+        Θέτουμε τον ελεγκτή ανάδρασης καταστάσεων υπό κορεσμό, εκτός της περιοχής λειτουργίας του, αφήνοντας τα χαρακτηριστικά απόκρισης ανεπηρέαστα.\\~\
+
+        \pause
+        Αντικαθιστούμε τις καταστάσεις του ελεγκτή με εκτιμήσεις αυτών, που προκύπτουν από ένα κατάλληλα σχεδιασμένο παρατηρητή υψηλού κέρδους, μετατρέποντας τον ελεγκτή ανάδρασης καταστάσεων σε ελεγκτή ανάδρασης εξόδου.
+    
+    \end{frame}
+ 
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+        
+        \textbf{Βήμα 1:} Δοσμένων των επιθυμητών προδιαγραφών απόκρισης, για κάθε σφάλμα παρακολούθησης εξόδου $e_1^i(t) = y^i - y_d^i(t)$, $i = 1, \ldots, m$, επιλέγουμε τη μέγιστη επιτρεπόμενη τιμή του στη μόνιμη κατάσταση $e_\infty^i$, και το επιθυμητό ελάχιστο ρυθμό σύγκλισής του σε αυτή, $\exp(-\lambda_i t)$.  
+    
+    \end{frame}
+  
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+    
+         \textbf{Βήμα 2:} Για κάθε $i = 1, \ldots, m$, επιλέγουμε θετικές παραμέτρους $a_1^i, \ldots, a_{r_i - 1}^i$, τέτοιες ώστε το πολυώνυμο:
+        \begin{equation*}
+            s^{r_i - 1} + a_{r_i - 1}^i s^{r_i - 2} + \cdots + a_2^i s + a_1^i = 0 
+        \end{equation*}
+        να έχει αρνητικές πραγματικές ρίζες $-b_j^i$, $j = 1, \ldots, r_i - 1$, που να ικανοποιούν
+        \[
+            \min \{b_j^i\} > \lambda_i.
+        \]
+        \pause
+        Τότε, τα γραμμικά φίλτρα
+        \[
+            \sigma_i(t) = \prod_{j=1}^{r_i - 1}\left( 
+            \frac{\mathrm d}{\mathrm dt} + b_j^i \right)e_1^i(t)
+        \]
+        είναι ευσταθή.
+    
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+        
+        \textbf{Βήμα 3:} Για κάθε $i = 1, \ldots, m$, επιλέγουμε κατάλληλες συναρτήσεις επίδοσης 
+        \[
+            \rho_i(t) = (\rho_0^i - \rho_\infty^i) \exp(-\lambda_i t) + \rho_\infty^i,
+        \]
+        τέτοιες ώστε οι παράμετροί τους να ικανοποιούν 
+        \begin{align*}
+            \rho_0^i > &\max \left \{ |\sigma_i(0)|\right \}\\
+            &\text{ \textlatin{s.t.} } x_0 \in X_0\\
+            &\text{ και } (y_d^i(0), \ldots, (\dv*{}{t})^{r_i} y_d^i(0)) \in Y_0^i,
+        \end{align*}
+        και $e_\infty^i = \rho^i_\infty/\prod_{j=1}^{r_i - 1} b_j^i$.
+    \end{frame}
+  
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+    
+        \textbf{Βήμα 4:} Ορίζουμε τον παρατηρητή υψηλού κέρδους:
+        \begin{equation*}
+            \dot{\hat e} = A \hat e + H (e_1 - C \hat e),
+        \end{equation*}
+        με $\hat e = \col\pqty{e_1^1, \ldots, e_{r_1}^1, e_1^2, \ldots, e_{r_m}^m}\in \R^r$ και $e_1 = \col\pqty{e_1^1, \ldots, e_1^m}$.\\~\
+        
+        \pause
+        Οι πίνακες $A$, $C$, αντιστοιχούν σε $m$ αλληλουχίες ολοκληρωτών $(A,B,C)$, και 
+        \[
+            H = \mathrm{bdiag}\pqty{H_1, \ldots, H_m}, \text{ με } H_i = \mathrm{col}(\flatfrac{\eta_1^i}{\mu},\ldots, \flatfrac{\eta_{r_i}^i}{\mu^{r_i}}),
+        \]
+        όπου $\mu < 1$ είναι μία θετική σταθερά, που επιλέγεται \emph{αρκούντως μικρή}, και οι θετικές σταθερές  $\eta^i_1, \ldots, \eta^i_{r_i}$, για $i = 1,\ldots, m$ επιλέγονται ώστε το πολυώνυμο
+        \begin{equation*}
+        \label{eq:hgo poly}
+        s^r_i + \eta_1^i s^{r_i-1} + \cdots 
+        + \eta_{r_i-1}^i s + \eta_{r_i}^i = 0
+        \end{equation*}
+        ευσταθές κατά \textlatin{Hurwitz}.
+
+    \end{frame}
+ 
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+    
+        \textbf{Βήμα 5:} Αντιστοίχως, ορίζουμε τα γραμμικά φίλτρα τα οποία έχουν ως είσοδο το $\hat e^i$, για $i = 1,\ldots, m$:
+        \begin{equation*}
+            \hat \sigma_i(t) = a_i^\T \hat e^i = \prod_{j=1}^{r_i - 1}\left( 
+            \frac{\mathrm d}{\mathrm dt} + b_j^i \right)\hat e^i_1(t),
+        \end{equation*}
+        όπου $a_i = \col(a_1^i, \ldots, a_{r_i-1}^i, 1)$ και $e^i = \col\pqty{e^i_1, \ldots, e^i_{r_i}}$, τα οποία είναι επίσης ευσταθή.
+    \end{frame}
+  
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+        \textbf{Βήμα 6:} Έστω η ομαλή, γνησίως αύξουσα, αμφιμονότιμη συνάρτηση $T: (-1, 1) \rightarrow (-\infty, +\infty)$ που ορίζεται ως:
+        \[
+            T(\star) = \ln \pqty{\frac{1+\star}{1-\star}},
+        \]
+        Με τη βοήθεια της απεικόνισης αυτής, ορίζουμε τον νόμο ελέγχου $u = \col(u_1, \ldots, u_m)$, όπου
+        \begin{equation*}
+            u_i = u_i^\star \sat\left(\frac{1}{u_i^\star} 
+            \frac{ -2 k_i T(\hat \sigma_i/ \rho_i)}
+            {(1 - (\hat \sigma_i/ \rho_i)^2)\rho_i} \right),
+        \end{equation*}
+        για $i = 1, \ldots, m$, όπου $u_i^\star$ \emph{επαρκώς μεγάλη} σταθερά και $k_i$ αυθαίρετο θετικό κέρδος.
+    \end{frame}
+  
+    \begin{frame}
+        \frametitle{Διαδικασία σχεδίασης}
+        Συνοψίζοντας, ο τελικός νόμος ελέγχου που προκύπτει περιγράφεται από τις εξισώσεις:
+        \begin{align*}
+            \dot{\hat e}^i &= A_i \hat e^i + H_i (e_1 - C_i \hat e^i),\\
+            \hat \sigma_i &= a_i^\T \hat e^i,\\
+            u_i &= u_i^\star \sat\left(\frac{1}{u_i^\star} 
+                \frac{ -2 k_i T(\hat \sigma_i/ \rho_i)}
+                {(1 - (\hat \sigma_i/ \rho_i)^2)\rho_i} \right),
+        \end{align*}
+        για κάθε $i = 1,\ldots, m$.
+    \end{frame}
+    
+    \begin{frame}
+      \frametitle{Ακαδημαϊκό παράδειγμα}
+      Έστω το ακόλουθο μη-γραμμικό σύστημα:
+      \begin{align*}
+          \dot z &= A z + x_2 + d_z(t)\\
+          \dot x_1^i &= x_2^i \\
+          \dot x_2^i &= x_3^i \\
+          \dot x_3^i &= f(z, x) + G(x)u + d_x(t)
+      \end{align*}
+      όπου $z = \col(z_1, z_2)$, $x = \col(x^1, x^2)$, $x^i = \col(x_1^i, x_2^i, x_3^i)$, $i =1, 2$, $x_j = \col(x_j^1, x_J^2)$, $j = 1,2,3$. Για το υποσύστημα της εσωτερικής δυναμικής, έχουμε:
+      \[
+      A = \bmqty{-\sfrac{1}{2} & -\sfrac{1}{3}\\ -\sfrac{2}{3} & -\sfrac{3}{4}},\quad d_z(t) = \bmqty{0.3 \sin(t)\\ 0.2\cos(t)}.
+      \]
+      όπου ο πίνακας $A$ είναι εμφανώς \textlatin{Hurwitz}.
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ακαδημαϊκό παράδειγμα}
+        Έστω:
+        \[
+            c_j^i = \cos(x_j^i),\ s^i_j = \sin(x_j^i),\ c_i^{12} = \cos(x_i^1 x_i^2).
+        \]
+        Έχουμε τις μη-γραμμικότητες:
+        \[
+        f(z, x) = \bmqty{
+          0.7 x_2^2 x_3^1 + 0.3 (z_2 + 0.75)^2\\
+          0.3 x_2^1 x_3^2 + 0.7 (z_1 + 1)^2
+        },\ 
+        G(x) = \bmqty{
+          1.2 + c_3^1 s_3^2 & 0.3 c_2^{12}\\
+          0.3 c_2^{12} & 1.7 + s_3^1 c_3^2
+        },
+        \]
+        με τον $G$ εμφανώς θετικά ορισμένο. Ακόμη,
+        \[
+        d_x(t) = \bmqty{
+          15(\theta(t - 4.5) - \theta(t - 5.5))\\
+          12(\theta(t - 5) - \theta(t -6))
+        }  
+        \]
+        όπου $\theta(\cdot)$ είναι η βηματική συνάρτηση \textlatin{Heaviside}. 
+    \end{frame}
+    
+    \begin{frame}
+      \frametitle{Ακαδημαϊκό παράδειγμα}
+      Θεωρούμε τις ακόλουθες τροχιές παρακολούθησης
+      \[
+          y_d^1(t) = \cos(2 t) \qq{και} y_d^2(t) = \sin(3 t),
+      \]
+      και τα ακόλουθα σύνολα αρχικοποίησης:
+      \begin{align*}
+          X_0 &= \bqty{-1,1}^6\\
+          Y_0^1 &= \bqty{0, 1} \times \bqty{-2,0} \times \bqty{-4, 0}\\
+          Y_0^2 &= \bqty{0,1} \times \bqty{0,3} \times \bqty{-9, 0}
+      \end{align*}
+      
+      \pause
+      Επιθυμούμε μέγιστο σφάλμα στη μόνιμη κατάσταση $e_\infty^i = 0.005$ και  ελάχιστος ρυθμό σύγκλισης $\exp(-2 t)$, $i =1,2$.
+      
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ακαδημαϊκό παράδειγμα}
+
+        Ελάχιστος ρυθμός σύγκλισης $\exp(-2t)$, άρα $b_j^i > 2$, $i,j=1,2$. \\~\
+       
+        \pause 
+        Επιλέγουμε $a_1^i,\ a_2^i$ ώστε τα πολυώνυμα $ s^{2} + a_2^i s + a_1^i = 0$ να έχουν διπλή αρνητική ρίζα $-b_j^i = -3$, για $i,j=1,2$.\\~\
+        
+        \pause
+        Επιλέγουμε $\rho_\infty^i$ τέτοιο ώστε $e_\infty^i = \flatfrac{\rho_\infty^i}{\prod_{j=1}^2 b_j^i} = 0.005$, $i=1,2$.\\~\
+        
+        \pause
+        Το $\rho_0^i$ επιλέγεται κατάλληλο ώστε $\rho_0^i > \abs{\sigma_i(0)}$ για τα σύνολα $X_0$, $Y_0^i$, $i=1,2$.\\
+        
+        \pause
+        \begin{center}
+            \captionof*{table}{\large Παράμετροι του ελεγκτή}
+            \begin{tabular}{ccccccccccc}
+                \toprule
+                $\rho_0^i$ & $\rho_\infty^i$ & $\lambda_i$ & $a_1^i$ & $a_2^i$ & 
+                $\eta_1^i$ & $\eta_2^i$ & $\eta_3^i$ & $\mu$ & $k_i$ & 
+                $u_i^\star$ \\ \midrule
+                $50$ & $0.045$ & $2$ & $9$ & $6$ & $15$ & $75$ & $125$ & 
+                $5\mathrm{e}{-5}$ & $30$ & $100$ \\ \bottomrule
+            \end{tabular}
+        \end{center}
+    \end{frame}
+    
+    
+    \begin{frame}
+      \frametitle{Ακαδημαϊκό παράδειγμα}
+      \selectlanguage{english}
+      \input{figures/simulations/fig-1.1.tikz}
+%      \begin{minipage}[t]{0.50\textwidth}
+%          \selectlanguage{english}
+%          \begin{center}
+%              \input{figures/simulations/fig-1.1.tikz}
+%          \end{center}
+%          \selectlanguage{greek}
+%      \end{minipage}%\
+%      \hfill
+%      \begin{minipage}[t]{0.48\textwidth}
+%        Σφάλματα παρακολούθησης εξόδου
+%      \end{minipage}
+
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ακαδημαϊκό παράδειγμα}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-1.2.tikz}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ακαδημαϊκό παράδειγμα}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-1.3.tikz}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ακαδημαϊκό παράδειγμα}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-1.4.tikz}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+        Έστω ο ρομποτικός βραχίονας 2 βαθμών ελευθερίας:
+        \[
+            \ddot q = - M^{-1}(q) \pqty{C(q,\dot q)\dot q + g(q)} + M^{-1}(q)u + M^{-1}(q)d(t),
+        \]
+        παρουσία εξωτερικών διαταραχών εισόδου:
+        \[
+            d(t) = \bmqty{
+                3\sin(t) + 4 \pqty{\theta(t-3) - \theta(t-5)}\\
+                2\cos(t) + 3 \pqty{\theta(t-4) - \theta(t-6)}
+            }.
+        \]
+        
+        \pause
+        \begin{center}
+            \captionof*{table}{\large Παράμετροι του βραχίονα}
+            \begin{tabular}{lcccc}
+                \toprule
+                $i$ & $m_i$ [\si{\kilogram}] & $I_{Z_i}$ [\si{\kilogram\metre^2}] & $\kappa_i$ [\si{\kilogram\metre^2\per\second}] & $\ell_i$ [\si{\metre}]\\ \midrule
+                $1$ & $3.2$ & $0.96$ & $1$ & $0.5$ \\
+                $2$ & $2.0$ & $0.81$ & $1$ & $0.4$ \\ \bottomrule
+            \end{tabular}
+        \end{center}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+        Θεωρούμε τις ακόλουθες τροχιές παρακολούθησης
+        \[
+            y_d^1(t) = \frac{90\pi}{180} + \frac{30\pi}{180}\cos(t) \qq{και}  
+            y_d^2(t) = \frac{90\pi}{180} - \frac{30\pi}{180}\sin(t),
+        \]
+        και τα ακόλουθα σύνολα αρχικοποίησης:
+        \begin{align*}
+            X_0 &= [0, 2\pi]^2 \times [-\pi/2, \pi/2]^2\\
+            Y_0^i &= [0, 2\pi] \times [-\flatfrac{\pi}{6},\flatfrac{\pi}{6}],\ i=1,2
+        \end{align*}
+        
+        \pause
+        Επιθυμούμε μέγιστο σφάλμα στη μόνιμη κατάσταση $e_\infty^i = \flatfrac{\pi}{180}$ και  ελάχιστος ρυθμό σύγκλισης $\exp(-1.5 t)$, $i =1,2$.\\
+        
+    \end{frame}
+    
+    
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+    
+        Ελάχιστος ρυθμός σύγκλισης $\exp(-1.5t)$, άρα $b_1^i > 1.5$, $i=1,2$. \\~\
+        
+        \pause 
+        Επιλέγουμε $a_1^i$ ώστε τα πολυώνυμα $ s + a_1^i = 0$ να έχουν αρνητική ρίζα $-b_1^i = -2$, για $i=1,2$.\\~\
+        
+        \pause
+        Επιλέγουμε $\rho_\infty^i$ τέτοιο ώστε $e_\infty^i = \flatfrac{\rho_\infty^i}{b_1^i} =\flatfrac{\pi}{180}$, $i=1,2$.\\~\
+        
+        \pause
+        Το $\rho_0^i$ επιλέγεται κατάλληλο ώστε $\rho_0^i > \abs{\sigma_i(0)}$ για τα σύνολα $X_0$, $Y_0^i$, $i=1,2$.\\
+        
+        \pause
+        \begin{center}
+            \captionof*{table}{\large Παράμετροι του ελεγκτή}
+            \begin{tabular}{ccccccccc}
+                \toprule
+                $\rho_0^i$ & $\rho_\infty^i$ & $\lambda_i$ & $a_1^i$ & $\eta_1^i$
+                & $\eta_2^i$ & $\mu$ & $k_i$ & $u_i^\star$ \\ \midrule
+                $30$ & $0.035$ & $1.5$ & $2$ & $10$ & $25$ & $1\mathrm{e}{-4}$ & $12$ & $30$ \\ \bottomrule
+            \end{tabular}
+        \end{center}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-2.1.tikz}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-2.2.tikz}
+    \end{frame}
+    
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-2.3.tikz}
+    \end{frame}
+        
+    \begin{frame}
+        \frametitle{Ρομποτικός βραχίονας}
+        \selectlanguage{english}
+        \input{figures/simulations/fig-2.4.tikz}
+    \end{frame}
+    
+    \appendix
+    
+    \begin{frame}[plain,c]
+        \begin{center}
+            Ευχαριστώ για την προσοχή σας\\~\
+            
+            \pause
+            \LARGE Ερωτήσεις?
+        \end{center}
+    \end{frame}
+
+    \begin{frame}
+        \frametitle{Ακολουθία ολοκληρωτών}
+        Για ένα σύστημα με ομοιόμορφο σχετικό βαθμό $\qty{r_1, \ldots r_m}$, ορίζουμε ως ακολουθία ολοκληρωτών $(A,B,C)$ τους ακόλουθους πίνακες:
+        \begin{align*}
+            A &= \bdiag\pqty{A_1, \ldots, A_m}\\
+            B &= \bdiag\pqty{B_1, \ldots, B_m}\\
+            C &= \bdiag\pqty{C_1, \ldots, C_m}
+        \end{align*}
+        \[
+            A_i = \begin{bmatrix}
+                0 & 1 & \cdots & \cdots & 0 \\
+                0 & 0 & 1 & \cdots & 0 \\
+                \vdots & & & & \vdots \\
+                0 & \cdots & \cdots & 0 & 1 \\
+                0 & \cdots & \cdots & \cdots & 0
+            \end{bmatrix}_{r_i \times r_i}\ 
+            B_i = \bmqty{0\\ 0\\ \vdots\\ 0\\ 1}_{r_i \times 1}\ 
+            C_i^\T = \begin{bmatrix}
+                1 \\ 0 \\ \vdots \\ 0 \\ 0
+            \end{bmatrix}_{r_i \times 1}
+        \]
+    \end{frame}
+\end{document}

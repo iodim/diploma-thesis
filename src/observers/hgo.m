@@ -11,7 +11,8 @@ function [dz, xhat] = hgo(t, z, y, alpha, mu)
 %   Ioannis Dimanidis (2017)
 
     z = z(:);
-    xhat = [y; z(2:end)];
+    xhat = z;
+%     xhat = [y; z(2:end)];
     n = length(z);
     A = brunovsky(n);
     H = alpha./(mu.^(1:n));

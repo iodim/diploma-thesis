@@ -1,0 +1,533 @@
+\chapter[]{Έλεγχος προδιαγεγραμμένης απόκρισης με ανάδραση εξόδου}
+\label{chap:ofppc}
+
+\section{Ορισμός του προβλήματος}
+Θεωρούμε ένα μη-γραμμικό σύστημα ΠΕΠΕ, τάξης $n$, με $m$ εισόδους και $m$ εξόδους, στην κανονική μορφή \textlatin{Byrnes-Isidori}~\cite{byrnes1991asymptotic, isidori2013nonlinear} με ομοιόμορφο σχετικό βαθμό $\{ r_1, \ldots, r_m \}$ και παρουσία εξωγενών διαταραχών, πεπλεγμένων στις μη-γραμμικότητες:
+\begin{subequations}
+    \label{eq:sys1}                
+    \begin{align}
+        \label{eq:sys1_zero_dynamics}
+        \dot z &= f_0(z, x, d(t))\\
+        \dot x_j^i &= x_{j+1}^i,\ j = 1,\ldots,r_i-1\\
+        \dot x_{r_i}^i &= f^i (z,x,d (t)) + g^i (z,x,d (t)) u\\
+        y^i &= x_1^i,
+    \end{align}
+\end{subequations}
+όπου $i = 1, \ldots, m$, $x^i = \col(x_1^i, \ldots, x_{r_i}^i) \in \R^{r_i}$, $x = \col(x^1, \ldots, x^m) \in \R^r$ είναι το διάνυσμα κατάστασης, $r = r_1 + r_2 + \ldots + r_m$, $z \in \R^{n-r}$, $u \in \R^m$ είναι η είσοδος ελέγχου, $y = \col(y^1, \ldots y^m)$ είναι το διάνυσμα εξόδου, και $d: \R_+ \rightarrow \R$ είναι μία διαταραχή, τμηματικά συνεχής και φραγμένη στο $t$. Τέλος, $f_0: \R^{n-r}\times \R^n \times \R \rightarrow \R^{n-r}$, $f^i: \R^{n-r}\times \R^n \times \R \rightarrow \R$, $g^i: \R^{n-r}\times \R^n \times \R \rightarrow \R^{1 \times m}$ είναι άγνωστες συναρτήσεις, τοπικά \lip\ στα ορίσματά τους. Υποθέτουμε πως οι καταστάσεις του συστήματος αρχικοποιούνται στο εσωτερικό ενός κλειστού και συμπαγούς συνόλου $\Omega_0 = Z_0 \times X_0 \subset \R^n$ που περιλαμβάνει την αρχή των αξόνων. Έστω το διανυσματικό πεδίο $f(z, x, d(t))$ που ορίζεται ως:
+\[
+    f(z, x, d(t)) = \begin{bmatrix}
+        f^1(z, x, d(t)) \\ f^2(z, x, d(t))\\
+        \vdots \\ f^m(z, x, d(t))
+    \end{bmatrix}_{m \times 1}
+\]
+και έστω ο πίνακας $G(z, x, d(t))$ που ορίζεται ως:
+\begin{equation}
+\label{eq:G}
+    G(z, x, d(t)) = \begin{bmatrix}
+        g^1(z, x, d(t))\\ g^2(z, x, d(t))\\
+        \vdots \\ g^m(z, x, d(t))
+    \end{bmatrix}_{m \times m}
+\end{equation}
+Δεδομένου ενός πίνακα $G$, με $G_s = \frac{1}{2}(G^\T + G)$ θα συμβολίζουμε το συμμετρικό του κομμάτι. Είμαστε πλέον έτοιμοι να διατυπώσουμε τις υποθέσεις μας.
+
+\begin{assumption}
+\label{assumption:posdef}
+    Ο πίνακας $G_s(z, x, d(t))$ είναι θετικά (ή αρνητικά) ορισμένος.
+\end{assumption}
+
+\begin{assumption}
+\label{assumption:reference}
+    Οι τροχιές αναφοράς $y_d^i(t)$, $i = 1, \ldots, m$, είναι μετρήσιμες και φραγμένες συναρτήσεις του χρόνου, που ανήκουν στη κλάση $\mathcal C^{r_i}$, και οι παράγωγοί τους μέχρι τάξης $r_i$ είναι άγνωστες αλλά φραγμένες. Όμως, απαιτείται επίγνωση του συνόλου $Y_0^i \subset \R^{r_i}$, στο εσωτερικό του οποίου ανήκει το διάνυσμα $\pqty{y_d^i(0), \ldots, (\dv*{}{t})^{r_i} y_d^i(0)}$. 
+\end{assumption}
+
+\begin{assumption}
+\label{assumption:output}
+    Μόνο το διάνυσμα εξόδου $y$ και καμία από τις καταστάσεις, $x$, $z$, είναι διαθέσιμο προς μέτρηση.
+\end{assumption}
+
+\begin{assumption}
+\label{assumption:init_set}
+    Οι $x$-καταστάσεις αρχικοποιούνται εντός ενός γνωστού συμπαγούς συνόλου $X_0 \subset \R^r$. Αντιθέτως, για τις $z$-καταστάσεις, απαιτείται μονάχα η ύπαρξη ενός συμπαγούς συνόλου αρχικοποίησης $Z_0 \subset \R^{n-r}$.
+%    Δε γνωρίζουμε ρητά τις αρχικές συνθήκες $z_0$, $x_0$ του~\eqref{eq:sys1}, αλλά γνωρίζουμε το σύνολο $X_0$ στο οποίο ανήκει το $x_0$. Η επίγνωση του  $Z_0$ δεν είναι απαραίτητη, αρκεί να γνωρίζουμε ότι υπάρχει και είναι ένα κλειστό και συμπαγές υποσύνολο του $\R^{n-r}$.
+\end{assumption}
+
+\begin{assumption}
+\label{assumption:bibs}
+    Η εσωτερική δυναμική~\eqref{eq:sys1_zero_dynamics} ευστάθεια φραγμένης-εισόδου-φραγμένης-εξόδου ως προς το $x(t)$ και $d(t)$, που σημαίνει ότι υπάρχει μια συνάρτηση $\pi$, κλάσης $\mathcal{K}$, και μια θετική σταθερά $\gamma$, ώστε να ικανοποιείται η ακόλουθη ανισοτική σχέση:
+    \begin{equation}
+    \label{eq:bibs}                
+        \norm{z(t)} \leq \gamma + \pi\pqty{\norm{\chi(t)}},\ \forall t \in \R_+,
+    \end{equation}
+    όπου $\chi(t) = \col(x(t), d(t))$.
+
+\end{assumption}
+
+\emph{Πρόβλημα Έλεγχου Προδιαγεγραμμένης Απόκρισης με Ανάδραση Εξόδου (ΕΠΑΑΕ):}. Θεωρούμε συστήματα της μορφής~\eqref{eq:sys1} που έχουν άγνωστες μη-γραμμικότητες, τοπικά \lip\ στα ορίσματά τους και τις Υποθέσεις~\ref{assumption:posdef}--\ref{assumption:bibs}. Θα σχεδιάσουμε έναν ελεγκτή, χωρίς εσωτερικό μοντέλο του συστήματος, που με χρήση μόνο ανάδρασης εξόδου θα μπορεί να πετύχει τις ακόλουθες ιδιότητες: 
+\begin{enumerate*}[label=(\alph*)]
+    \item όλα τα σήματα του κλειστού βρόχου θα είναι φραγμένα για κάθε $t \geq 0$ και
+    \item τα σφάλματα παρακολούθησης εξόδου $e^i_1 = y^i - y_d^i(t)$, $i = 1,\ldots, m$, θα συγκλίνουν τουλάχιστον $\exp(-\lambda_i t)$ εκθετικά γρήγορα σε μία περιοχή του μηδενός $E_i = \{e^i \in \R: |e^i| < e^i_\infty\}$, με $e_\infty^i = \rho^i_\infty/\prod_{j=1}^{r_i - 1} b_j^i$,  όπου $\lambda_i >0$, $\rho_\infty^i >0$, και $b_j^i>0$, $i = 1,\ldots, m$, $j = 1, \ldots, r_i - 1$ είναι προεπιλεγμένες σταθερές.
+\end{enumerate*}
+
+\section{Σχήμα ελέγχου}
+\label{section:control}
+Σε αυτήν την ενότητα, θα παρουσιάσουμε ένα σχήμα ελέγχου που θα λύσει το πρόβλημα ΕΠΑΑΕ για συστήματα της μορφής~\eqref{eq:sys1}. Η διαδικασία σχεδίασης απαρτίζεται από τα ακόλουθα βήματα:
+
+\begin{enumerate}[label=\Roman*., ref=\Roman*]
+    \item \label{item:performance_characteristics}
+        Δοσμένων των επιθυμητών προδιαγραφών απόκρισης, για κάθε σφάλμα παρακολούθησης εξόδου $e_1^i(t)$, $i = 1, \ldots, m$, επιλέγουμε τη μέγιστη επιτρεπόμενη τιμή του στη μόνιμη κατάσταση $e_\infty^i$, και το επιθυμητό ελάχιστο ρυθμό σύγκλισής του σε αυτή, $\exp(-\lambda_i t)$.  
+    \item\label{item:surface_parameters}
+        Για κάθε $i = 1, \ldots, m$, επιλέγουμε θετικές παραμέτρους $a_1^i, \ldots, a_{r_i - 1}^i$, τέτοιες ώστε το πολυώνυμο:
+        \begin{equation}
+            \label{eq:hurwitz1}
+            s^{r_i - 1} + a_{r_i - 1}^i s^{r_i - 2} + \cdots + a_2^i s + a_1^i = 0 
+        \end{equation}
+        να έχει αρνητικές πραγματικές ρίζες $-b_j^i$, $j = 1, \ldots, r_i - 1$, που να ικανοποιούν
+        \[
+            \min \{b_j^i\} > \lambda_i.
+        \]
+        Τότε, τα γραμμικά φίλτρα
+        \[
+            \sigma_i(t) = \prod_{j=1}^{r_i - 1}\left( 
+            \frac{\mathrm d}{\mathrm dt} + b_j^i \right)e^i_1(t)
+        \]
+        όπου $e^i_1(t) = y^i(t) - y_d^i(t)$, είναι ευσταθή.
+    \item\label{item:rho_parameters}
+        Για κάθε $i = 1, \ldots, m$, επιλέγουμε κατάλληλες συναρτήσεις επίδοσης $\rho_i(t) = (\rho_0^i - \rho_\infty^i) \exp(-\lambda_i t) + \rho_\infty^i$ τέτοιες ώστε οι παράμετροί τους να ικανοποιούν 
+            \begin{align*}
+                \rho_0^i > &\max \left \{ |\sigma_i(0)|\right \}\\
+                &\text{ \textlatin{s.t.} } x_0 \in X_0\\
+                &\text{ και } (y_d^i(0), \ldots, (\dv*{}{t})^{r_i} y_d^i(0)) \in Y_0^i,
+            \end{align*}
+        και $e_\infty^i = \rho^i_\infty/\prod_{j=1}^{r_i - 1} b_j^i$.
+    \item \label{item:hgo}
+        Ορίζουμε μια δομή διαφοριστή της ακόλουθης μορφής:
+        \begin{equation}
+            \label{eq:hgo}
+            \dot{\hat e} = A \hat e + H (e_1 - C \hat e),
+        \end{equation}
+        όπου $\hat e^i = \col(\hat e_1^i, \ldots, \hat e_{r_i}^i) \in \R^{r_i}$ είναι ένα διανυσμα που περιέχει εκτιμήσεις των $e_1^i$ και των παραγώγων τους, μέχρι τάξης $r_i -1$, $\hat e = \col(\hat e^1, \ldots, \hat e^m) \in \R^r$, $e_1 = \col(e_1^1, \ldots, e_1^m) \in \R^m$ και $A$, $H$, $C$ είναι μπλοκ-διαγώνιοι πίνακες με διαγώνια στοιχεία $A_i$, $H_i$, $C_i$ αντιστοίχως, $i = 1,\ldots, m$, που ορίζονται ως:
+        \[
+            A_i = \begin{bmatrix}
+                0 & 1 & \cdots & \cdots & 0 \\
+                0 & 0 & 1 & \cdots & 0 \\
+                \vdots & & & & \vdots \\
+                0 & \cdots & \cdots & 0 & 1 \\
+                0 & \cdots & \cdots & \cdots & 0
+            \end{bmatrix}_{r_i \times r_i},
+        \]
+        και
+        \[
+            H_i = \begin{bmatrix}
+                \eta_1^i/\mu \\ \eta_2^i/\mu^2 \\ \vdots \\ 
+                \eta_{r_i-1}^i/\mu^{r_i-1} \\ \eta_{r_i}^i/\mu^{r_i}
+            \end{bmatrix}_{r_i \times 1}, 
+            C_i^\T = \begin{bmatrix}
+                1 \\ 0 \\ \vdots \\ \vdots \\ 0
+            \end{bmatrix}_{r_i \times 1},
+        \]
+        όπου $\mu$ είναι μία θετική σταθερά, που επιλέγεται \emph{αρκούντως μικρή}, και οι θετικές σταθερές  $\eta^i_1, \ldots, \eta^i_{r_i}$, για $i = 1,\ldots, m$ επιλεγονται ώστε το πολυώνυμο
+        \begin{equation}
+            \label{eq:hgo poly}
+            s^r_i + \eta_1^i s^{r_i-1} + \cdots 
+            + \eta_{r_i-1}^i s + \eta_{r_i}^i = 0
+        \end{equation}
+         ευσταθές κατά \hur.
+    \item 
+        Αντιστοίχως, ορίζουμε τα γραμμικά φίλτρα τα οποία έχουν ως είσοδο το $\hat e^i$, για $i = 1,\ldots, m$:
+        \begin{equation}
+            \label{eq:surface estimate}
+            \hat \sigma_i(t) = a_i^\T \hat e^i = \prod_{j=1}^{r_i - 1}\left( 
+            \frac{\mathrm d}{\mathrm dt} + b_j^i \right)\hat e^i_1(t),
+        \end{equation}
+        όπου $a_i = \col(a_1^i, \ldots, a_{r_i-1}^i, 1)$.
+    \item \label{item: control}
+        Έστω η ομαλή, γνησίως αύξουσα, ένα προς ένα και επί απεικόνιση $T: (-1, 1) \rightarrow (-\infty, +\infty)$ που ορίζεται ως:
+        \[
+            T(\star) = \ln \pqty{\frac{1+\star}{1-\star}},
+        \]
+        η οποία συζητήθηκε στο \cref{chap:ppc}, με τη διαφορά ότι εδώ θεωρούμε $M_i = 1$. Με τη βοήθεια της απεικόνισης αυτής, ορίζουμε τον νόμο ελέγχου $u = \col(u_1, \ldots, u_m)$, όπου
+        \begin{equation}
+            \label{eq:control_law}
+            u_i = u_i^\star \sat\left(\frac{1}{u_i^\star} 
+            \frac{ -2 k_i T(\hat \sigma_i/ \rho_i)}
+            {(1 - (\hat \sigma_i/ \rho_i)^2)\rho_i} \right),
+        \end{equation}
+        για $i = 1, \ldots, m$, όπου $u_i^\star$ και $k_i$ θετικές σταθερές.
+\end{enumerate}
+
+\begin{remark}
+    \label{remark:manifold}
+    Οι επιθυμητές προδιαγραφές απόκρισης επιβάλλονται στις επιφάνειες που κατασκευάζονται στο Βήμα~\ref{item:surface_parameters}. Όπως θα διευκρινιστεί στην \cref{section:stability}, με τη χρήση του Λήμματος~\ref{lemma} μπορούμε να μεταφράσουμε τα χαρακτηριστικά απόκρισης των επιφανειών $\sigma_i(t)$ σε χαρακτηριστικά απόκρισης των σφαλμάτων παρακολούθησης εξόδου.
+\end{remark}
+
+\begin{remark}
+    Είναι εμφανές ότι χρησιμοποιούμε μόνο τα $y$ και $y_d(t)$ και όχι τις παραγώγους τους, αφού αυτές εκτιμούνται με τη χρήση ενός παρατηρητή υψηλού κέρδους που λειτουργεί ως διαφοριστής πάνω στη μετρήσιμη έξοδο. Συνεπώς επιτυγχάνουμε ανάδραση εξόδου χωρίς τη χρήση των παραγώγων του $y_d(t)$.
+\end{remark}
+
+\begin{remark}
+    \label{remark:appropriately}
+    Προηγουμένως αναφέρθηκε ότι οι παράμετροι $\mu$ και $u_i^\star$, $i = 1, \ldots, m$ πρέπει να επιλεχθούν \emph{επαρκώς μικρό} και \emph{επαρκώς μεγάλα} αντίστοιχα. Όπως θα δείξουμε στις  \cref{section:input_saturation,section:output_feedback}, υπάρχουν θετικές σταθερές $\bar \mu$, $\bar u_1, \ldots, \bar u_m$, που δεν μπορούν να προκαθοριστούν, τέτοιες ώστε για κάθε $\mu < \bar \mu$ και $u_i^\star > \bar u_i$, $i = 1,\ldots, m$, να λύνεται το πρόβλημα ΕΠΑΑΕ για το~\eqref{eq:sys1}. Όμως, οι προδιαγραφές απόκρισης στο σύστημα \cref{eq:sys1} είναι ανεξάρτητες των $\bar \mu$ και $u_i^\star$, $i = 1, \ldots, m$.
+\end{remark}
+
+\begin{remark}
+    \label{remark:overshoot}
+     Καθώς υποθέτουμε ελάχιστη γνώση των αρχικών συνθηκών του συστήματος~\eqref{eq:sys1}, δηλαδή μόνο το σύνολο $X_0$ στο εσωτερικό του οποίου βρίσκονται οι αρχικές συνθήκες $x_0$, καθώς και του συνόλου $Y_0^i$ στο οποίο ανήκει το διάνυσμα $\pqty{y_d^i(0), \ldots, (\dv*{}{t})^{r_i} y_d^i(0)}$, δεν μπορούμε να γνωρίζουμε το πρόσημο του $\sigma_i(0)$, και ως εκ τούτου δεν είμαστε ικανοί να προκαθορίσουμε την υπερύψωση κατά το μεταβατικό της παρακολούθησης τροχιάς. Επομένως, δε μπορούμε να επιλέξουμε μία συνάρτηση μετασχηματισμού όπως ορίζεται στις εξισώσεις~\eqref{eq:transformation_mapping},~\eqref{eq:transformation_definition}, οπότε θεωρούμε πως $M_i =1$. Αν $M_i \neq 1$, θα έπρεπε να εξασφαλίσουμε πως οι ανισότητες~\eqref{eq:ineq1a} και~\eqref{eq:ineq1b} ικανοποιούνται ταυτόχρονα για $t = 0$, δηλαδή\ $-M_i\rho_i(0) < \sigma_i(0) < M_i\rho_i(0)$, το οποίο ουσιαστικά είναι μία κλιμάκωση του $\rho_0^i$ και του $\rho_\infty^i$.
+\end{remark}
+
+\begin{remark}
+    \label{remark:complexity}
+    Το προτεινόμενο σχήμα ελέγχου δεν προϋποθέτει κάποια γνώση για τις μη-γραμμικότητες του συστήματος ή έστω κάποιων συναρτήσεων που να τις φράσσουν. Επιπλέον, δεν χρησιμοποιεί δομές εκτίμησης (όπως νευρωνικά δίκτυα, ασαφή συστήματα, κλπ.) ώστε να αποκτήσει κάποια πληροφορία για το σύστημα. Περαιτέρω, δεν απαιτούνται δύσκολοι υπολογισμοί (αναλυτικοί και αριθμητικοί) για να παραχθεί το σήμα ελέγχου. Συνεπώς, ο προτεινόμενος ελεγκτής είναι χαμηλής πολυπλοκότητας.
+\end{remark}
+
+\section{Ανάλυση ευστάθειας}
+\label{section:stability}
+
+Αυτή η ενότητα είναι αφιερωμένη στη σχεδίαση και στην ανάλυση της ευστάθειας ενός ελεγκτή ανάδρασης εξόδου, ικανό να εφαρμόσει προδιαγεγραμμένα χαρακτηριστικά απόκρισης σε μία κλάση αβέβαιων μη-γραμμικών συστημάτων.
+
+Η διαδικασία σχεδίασης του ελεγκτή αυτού μπορεί να χωριστεί σε τρία στάδια. Αρχικά, σχεδιάζεται ένας ελεγκτής ανάδρασης καταστάσεων, που να μπορεί να πετύχει παρακολούθηση τροχιάς, με προδιαγεγραμμένα χαρακτηριστικά απόκρισης στο σφάλμα εξόδου, προϋποθέτοντας ότι το διάνυσμα των καταστάσεων είναι διαθέσιμο προς μέτρηση. Έπειτα, το σήμα ελέγχου υπόκειται κορεσμό, σε επίπεδο κατάλληλο ώστε υπό ανάδραση καταστάσεων τα χαρακτηριστικά απόκρισης του κλειστού βρόχου να παραμένουν ανεπηρέαστα, δηλαδή η γραμμική περιοχή του κορεσμού επιλέγεται ως ένα υπερσύνολο της περιοχής λειτουργίας του ελεγκτή. Τέλος, μετατρέπουμε το σχήμα ελέγχου από ανάδραση καταστάσεων σε ανάδραση εξόδου, αντικαθιστώντας τις καταστάσεις με εκτιμήσεις αυτών που μας παρέχει ένας παρατηρητής υψηλού κέρδους, ο οποίος λειτουργεί ως διαφοριστής πάνω στο μετρήσιμο σφάλμα παρακολούθησης εξόδου.
+
+\subsection{Σχεδίαση ελέγχου με ανάδραση καταστάσεων}
+Ο σκοπός μας είναι η έξοδος $y^i$ να παρακολουθεί την τροχιά αναφοράς $y_d^i(t)$, για $i = 1,\ldots, m$ με τις επιθυμητές προδιαγραφές απόκρισης, όπως περιγράφεται στο Βήμα~\ref{item:performance_characteristics} της Ενότητας ~\ref{section:control}. Δεδομένου αυτού, έστω η αλλαγή συντεταγμένων:
+\begin{equation*}
+    e_j^i = x_j^i - \ddt^{j-1}y_d^i(t),
+\end{equation*}
+με $i = 1, \ldots, m$ και $j = 1, \ldots r_i$, η οποία μετασχηματίζει το σύστημα~\eqref{eq:sys1} στο ακόλουθο:
+\begin{subequations}
+    \label{eq:sys2}
+    \begin{align}
+        \dot z &= f_0(z, e + \psi(t), d(t))\\
+        \dot e_j^i &= e_{j+1}^i,\ j = 1,\ldots,r_i-1\\
+        \begin{split}
+            \dot e_{r_i}^i & = f^i(z,e + \psi(t),d(t)) \\
+                &\quad+ g^i(z,e + \psi(t),d(t))u - \ddt^{r_i} y_d^i(t)
+        \end{split}\\
+        w^i &= e_1^i,
+    \end{align}
+\end{subequations}
+όπου $i = 1, \ldots, m$, $w^i$ είναι η νέα έξοδος, που αντιπροσωπεύει το μετρήσιμο σφάλμα παρακολούθησης εξόδου, $e^i = \col(e_1^i, \ldots, e_{r_i}^i) \in \R^{r_i}$, $e = \col(e^1, \ldots, e^m) \in \R^r$ είναι ένα διάνυσμα που περιλαμβάνει τα σφάλματα παρακολούθησης εξόδου καθώς και τις παραγώγους τους, $\psi^i(t) = \col( y_d^i(t), \ldots, \ddt^{r_i-1} y_d^i(t))$, και τέλος $\psi(t) = \col(\psi^1(t), \ldots, \psi^m(t))$. %Also, let the initial conditions $e_0 = e(0)$ belong inside $E_0 = \{e_0 \in \R^r: x_0 \in X_0 \}$.
+
+Θεωρούμε τα $a^i_1, \ldots, a^i_{r_i-1}$, για $i = 1, \ldots, m$, που είναι θετικές σταθερές διαλεγμένες κατάλληλα, όπως περιγράφεται στο Βήμα~\ref{item:surface_parameters} της Ενότητας ~\ref{section:control}. Τότε, ορίζουμε τα ευσταθή γραμμική φίλτρα:
+\begin{equation}
+    \label{eq:surface1}
+    \sigma_i(e^i) = a_i^\T e^i = \prod_{j=1}^{r_i-1}
+    \left(\frac{\mathrm d}{\mathrm dt} + b_j^i \right) w^i,
+\end{equation}
+με $a_i = \col(a_1^i, \ldots, a_{r_i-1}^i, 1)$, για $i=1,\ldots,m$. Παραγωγίζοντας την εξίσωση~\eqref{eq:surface1} ως προς το χρόνο, έχουμε
+\begin{equation}
+    \label{eq:surface2}
+    \dot \sigma_i = \varphi_i(t,z,e) + g^i(z,e + \psi(t),d(t))u,
+\end{equation}
+για $i = 1, \ldots, m$, όπου
+\begin{equation*}
+    \varphi_i(t,z,e) = f^i(z,e + \psi(t),d(t)) 
+        - \left(\mathrm d/ \mathrm dt \right)^{r_i} y_d^i(t)
+        + \sum_{j=1}^{r_i - 1} a_j^i e^i_{j+1}.
+\end{equation*}
+Συμβολίζοντας $\sigma = \col(\sigma_1, \ldots, \sigma_m)$, μπορούμε να ξαναγράψουμε την εξίσωση~\eqref{eq:surface2} με ένα πιο συμπαγή τρόπο:
+\begin{equation}
+\label{eq:surface3}
+    \dot \sigma = \varphi(t,z,e) + G(z, e + \psi(t), d(t)) u,
+\end{equation}
+όπου
+\[
+    \varphi(t,z,e) = \begin{bmatrix}
+    \varphi_1(t,z,e)\\ \varphi_2(t,z,e)\\
+    \vdots \\ \varphi_m(t,z,e)
+    \end{bmatrix}_{m \times 1}
+\]
+και $G(z, e + \psi(t), d(t))$ όπως ορίστηκε στην~\eqref{eq:G}.
+
+Θεωρούμε τις εκθετικά αποσβενόμενες συναρτήσεις επίδοσης $\rho_i(t) = (\rho_0^i - \rho_\infty^i) \exp(- \lambda_i t) + \rho_\infty^i$, με $i=1 \ldots, m$, με τις παραμέτρους τους επιλεγμένες όπως περιγράφεται στο Βήμα~\ref{item:rho_parameters} της Ενότητας ~\ref{section:control}. Ορίζουμε το διάνυσμα των κανονικοποιημένων ως προς τις συναρτήσεις επίδοσης σφαλμάτων $\xi = \col(\xi_1, \ldots, \xi_m)$, όπου $\xi_i = \sigma_i/\rho_i(t)$ και κατασκευάζουμε τον επαυξημένο κλειστό βρόχο:
+\begin{subequations}
+    \label{eq:sys3}
+    \begin{align}
+        \dot z &= f_0(z, e + \psi(t), d(t))\\
+        \dot e_j^i &= e_{j+1}^i,\ j = 1,\ldots,r_i-1\\
+        \begin{split}
+            \dot e_{r_i}^i &= f^i(z,e + \psi(t),d(t)) \\
+                &\quad + g^i(z,e + \psi(t),d(t))u - \ddt^{r_i} y_d^i(t)
+        \end{split}\\
+        \begin{split}
+            \dot \xi &= \Rho^{-1}(t) \left(
+                \varphi(t,z,e) \vphantom{\dot \Rho} \right. \\
+                & \quad \left. + G(z, e + \psi(t), d(t))u 
+                - \dot \Rho(t)\xi \right),
+        \end{split}
+    \end{align}
+\end{subequations}
+για $i = 1, \ldots, m$, όπου $\Rho(t) = \diag(\rho_1(t), \ldots, \rho_m(t))$. Θεωρούμε τον νόμο ελέγχου ανάδρασης καταστάσεων  $u = \col(u_1, \ldots, u_m)$ με 
+\begin{equation}
+\label{eq:state_feedback_control_elementwise}
+    u_i(t, e^i) = - \frac{2 k_i T(\xi_i(e^i))}
+    {\left(1- {\xi_i(e^i)}^2\right)\rho_i(t)},\ i = 1, \ldots, m,
+\end{equation}
+με τον μετασχημτισμό $T$ όπως ορίστηκε στο Βήμα\ref{item: control} της Ενότητας~\ref{section:control}. Η εξίσωση~\eqref{eq:state_feedback_control_elementwise} μπορεί να γραφεί σε διανυσματική μορφή ως εξής:
+\begin{equation}
+\label{eq:state_feedback_control}
+    u(t, \xi) = - D(\xi)K T(\xi),
+\end{equation}
+όπου $K = \diag(k_1, \ldots, k_m)$ και
+\begin{align*}
+    D(t, \xi) &= \diag \left( \frac{1}{\rho_1(t)} \frac{\partial T(\xi_1)}
+        {\partial \xi_1}, \ldots, \frac{1}{\rho_m(t)} \frac{\partial T(\xi_m)}
+        {\partial \xi_m} \right) \\
+    &= \diag \left( \frac{2}{(1 - \xi_1^2)\rho_1(t)}, \ldots, 
+        \frac{2}{(1-\xi_m^2)\rho_m(t)} \right).   
+\end{align*}
+Να σημειωθεί ότι στην εξίσωση~\eqref{eq:state_feedback_control}, με μια μικρή κατάχρηση συμβολισμού, συμβολίζουμε με $T(\xi)$ το διάνυσμα $\col(T(\xi_1), \ldots, T(\xi_m))$. 
+
+\begin{lemma}{\cite{bechlioulis2013output}}
+\label{lemma}
+    Έστω το διάνυσμα κατάστασης $e = \col(e^1, \ldots, e^m)$ του συστήματος~\eqref{eq:sys2}, με $e^i = \col(e_1^i, \ldots, e_{r_i}^i)$. Έστω επίσης, για $i = 1, \ldots, m$, οι επιφάνειες $\sigma_i(e^i(t))$ και οι συναρτήσεις επίδοσης $\rho_i(t)$ όπως ορίστηκαν στα Βήματα~\ref{item:surface_parameters} και~\ref{item:rho_parameters} της Ενότητας~\ref{section:control}. Αν $\abs*{\sigma_i(e^i(t))} < \rho_i(t)$ για κάθε $t \geq 0$, τότε θα υπάρχουν θετικές σταθερές $\bar e_j^i$, τέτοιες ώστε:
+    \[
+    \abs{e_j^i(t)} \leq \bar e_j^i \exp(-\lambda_i t) + \frac{2^{j-1} \rho_\infty^i}{\prod_{l=1}^{r_i - j} b_l^i},
+    \]
+    για $t \geq 0$, $i = 1,\ldots,m$, $j = 1,\ldots, r_i$.
+\end{lemma}
+
+Πλέον είμαστε έτοιμοι να διατυπώσουμε και να αποδείξουμε το ακόλουθο θεώρημα:
+
+\begin{theorem}
+    \label{theorem_sf}
+    Έστω το σύστημα~\eqref{eq:sys1} και οι \Cref{assumption:posdef,assumption:reference,assumption:bibs,assumption:init_set}. Έστω επίσης, πως οι $x$-καταστάσεις είναι διαθέσιμες προς μέτρηση. Ο νόμος ελέγχου μερικής ανάδρασης καταστάσεων~\eqref{eq:surface1},~\eqref{eq:state_feedback_control} με παραμέτρους $a_1^i, \ldots, a_{r_i-1}^i$ και συναρτήσεις επίδοσης $\rho_i$, $i = 1,\ldots, m$, επιλεγμένες όπως έχει περιγραφεί στα Βήματα~\ref{item:surface_parameters} και~\ref{item:rho_parameters} της ενότητας \cref{section:control} εγγυάται ότι:
+    \begin{enumerate*}[label=(\alph*)]
+        \item όλα τα σήματα του κλειστού βρόχου είναι φραγμένα και
+        \item τα σφάλματα παρακολούθησης εξόδου $w^i$, $i = 1, \ldots, m$, συγκλίνουν με ελάχιστο εκθετικό ρυθμό  $\exp(-\lambda_i t)$ στο σύνολο $\qty{w^i \in \R: \abs{w^i} \leq \flatfrac{\rho_\infty^i}{\prod_{j=1}^{r_i-1} b_j^i}}$.
+    \end{enumerate*}
+\end{theorem}
+
+\begin{proof}
+Το σύστημα~\eqref{eq:sys1} με τον ελεγκτή~\eqref{eq:surface1},~\eqref{eq:state_feedback_control} μπορεί να γραφεί στην επαυξημένη του μορφή,~\eqref{eq:sys3}. Σύμφωνα με το \Cref{lemma}, όταν $\xi \in (-1,1)^m$, τότε $e^i \in \Omega_e^i$, όπου
+\[
+    \Omega_e^i = \left\{e^i \in \mathbb R^{r_i} : 
+    |e_j^i| \leq \bar e_j^i 
+    + \frac{2^{j-1} \rho_\infty^i}
+    {\prod_{l=1}^{r_i - j} b^i_l},\
+    j = 1, \ldots, r_i \right\},
+\]
+για $i = 1, \ldots, m$, για κάποιες θετικές σταθερές $\bar e_j^i$ εξαρτώμενες μόνο από τις αρχικές συνθήκες και τις παραμέτρους σχεδίασης. Ορίζουμε το σύνολο $\Omega_e = \prod_{i=1}^m \Omega_e^i$. Καθώς τα $\psi(t)$ και $d(t)$ είναι φραγμένα εξ υποθέσεως, μπορούμε να ορίσουμε την ακόλουθη σταθερά:
+\begin{align*}
+    \bar \pi = &\max\qty{\pi \pqty{\norm{\chi}}}\\
+    & \text{ \textlatin{s.t.} } e \in \Omega_e.
+\end{align*}
+Ορίζουμε τα σύνολα $\Omega_z = \qty{z \in \R^{n-r} : \norm{z} \leq \gamma + \bar \pi}$ και $Q = \Omega_z \times \Omega_e \times {(-1,1)}^m$. Χάριν του γεγονότος ότι $(z(0), e(0), \xi(0)) \in Q$, της τοπικά \lip\ συνέχειας της δεξιάς πλευράς της εξίσωσης~\eqref{eq:sys3} ως προς το $(z,e,\xi)$ και τη συνέχεια της ως προς το $t$, από το Θεώρημα Μέγιστα Εκτεταμένης Λύσης (\cref{thm:maximal}), έχουμε πως υπάρχει μία μοναδική μέγιστα επεκτεταμένη λύση
+\[
+    (z(t), e(t), \xi(t)) \in Q,\ \forall t \in [0, \tau_f)
+\]
+με $\tau_f \in (0, +\infty]$. Ορίζουμε τα μετασχηματισμένα σφάλματα $\varepsilon_i = T(\xi_i)$, τα οποία είναι καλώς ορισμένα για το χρονικό διάστημα στο οποίο η μέγιστα επεκτεταμένη λύση υπάρχει, και έστω $\varepsilon = \col(\varepsilon_1, \ldots, \varepsilon_m)$. Θεωρούμε την θετικά ορισμένη και μη-ακτινικά φραγμένη συνάρτηση $V = \varepsilon^\T K \varepsilon$ και την παράγωγό της πάνω στις τροχιές του συστήματος~\eqref{eq:sys3}:
+\begin{align*}
+    \dot V &= -\varepsilon^\T K D(t, \xi) 
+        G(z, e + \psi(t), d(t))  D(t,\xi) 
+        K \varepsilon \\
+    & \quad + \varepsilon^\T K D(t,\xi)\left(
+        \varphi(t,z,e) + \dot \Rho(t) \xi\right)\\
+    &\leq - \ubar G_s \norm{K D(t, \xi) \varepsilon}^2
+        + \norm{K D(t, \xi) \varepsilon} \bar \varphi,
+\end{align*}
+όπου $\bar \varphi$ είναι ένα άνω φράγμα του $\norm{\varphi(t,z,e) + \dot \Rho(t) \xi}$ για $t \in [0,\tau_f)$ και
+\begin{align*}
+    \ubar{G}_s = &\min \{ \lambda_{\min}\{ G_s(z, e+\psi(t),d(t)) \} \}\\
+    & \text{ \textlatin{s.t.} }  (z, e) \in Z \times \Omega_e,\ t \in [0,\tau_f),
+\end{align*}
+το οποίο είναι θετικό εξ υποθέσεως, όπου με $\lambda_{\min}\{\cdot\}$ συμβολίζουμε την ελάχιστη ιδιοτιμή ενός πίνακα. Να σημειωθεί ότι το $\bar \varphi$ και το $\ubar G_s$ είναι ανεξάρτητα του $\tau_f$ καθώς η άμεση εξάρτησή τους από το χρόνο εκφράζεται μέσα από συναρτήσεις φραγμένες στο $t$. Φράσσοντας περαιτέρω τη $\dot V$, καταλήγουμε:
+\[
+    \dot V \leq - \frac{1}{2} \ubar G 
+    \norm{K D(t,\xi) \varepsilon}^2, \text{ για } \norm{K D(t, \xi) \varepsilon} \geq 2 \bar \varphi/\ubar{G}_s
+\]
+δεδομένου ότι $||K D(t, \xi) \varepsilon|| \geq 2 \bar \varphi/\ubar{G}_s$, ή ισοδύναμα
+\begin{align*}
+    \dot V &\leq -\frac{1}{2} \ubar{G}_s \sum_{i=1}^m \left(
+    \frac{2 k_i \varepsilon_i}{(1 - \xi_i^2)\rho_i(t)}
+    \right)^2 
+    \leq -\frac{1}{2} \ubar{G}_s \sum_{i=1}^m \left(
+    \frac{2 k_i \varepsilon_i}{(1 - \xi_i^2)\rho_0^i}
+    \right)^2,
+\end{align*}
+όταν $\norm{K D(t, \xi) \varepsilon} \geq 2\bar \varphi/\ubar{G}_s$. Μία ικανή συνθήκη για το παραπάνω θα ήταν:
+\begin{equation}
+\label{eq:sufficient condition}
+    \abs{\frac{2 k_i \varepsilon_i}{(1 - \xi_i^2)\rho_i(t)}}
+    \geq \abs{\frac{2 k_i \varepsilon_i}{\rho_i(t)}}
+    \geq 2\bar \varphi/\ubar{G}_s,
+\end{equation}
+για κάθε $i = 1, \ldots, m$. Επομένως, 
+\begin{align*}
+    \abs{\varepsilon_i(t)} \leq \bar \varepsilon_i = &\max \left \{ 
+        \varepsilon_i(0), \frac{\bar \varphi \rho_0^i}
+        {2 k_i \ubar{G}_s} \right \}\\
+    &\text{ \textlatin{s.t.} } x_0 \in X_0\\
+    &\text{ και } (y_d^i(0), \ldots, (\dv*{}{t})^{r_i} y_d^i(0)) \in Y_0^i,
+\end{align*}
+για κάθε $i = 1,\ldots,m$ και $t$ στο $[0, \tau_f)$. Συνεπώς, από τον ορισμό των $\varepsilon_i$ έχουμε ότι οι τροχιές $\xi(t)$ εξελίσσονται μέσα σε ένα κλειστό και συμπαγές υποσύνολο του $(-1,1)^{m}$, πιο συγκεκριμένα το σύνολο $\Xi = \prod_{i=1}^m \Xi_i$, με $\Xi_i = [- \bar \xi_i, \bar \xi_i]$ και $\bar \xi_i = T^{-1}(\bar \varepsilon_i)$, για $i = 1,\ldots,m$. Να σημειωθεί ότι το $e(t)$ δεν μπορεί να ξεφύγει του $\Omega_e$ ούτε το $z(t)$ του $\Omega_z$ χωρίς πρώτα το $\xi$ να ξεφύγει από το  $\Xi$. Άρα, υποθέτοντας πως $\tau_f < \infty$, υπάρχει μία χρονική στιγμή $\tau' \in [0, \tau_f)$, τέτοια ώστε $\xi(\tau') \notin \Xi$ (\cref{thm:contr}). Όμως, αυτό δεν ισχύει, καθώς μόλις αποδείξαμε ότι $\xi(t) \in \Xi$ για κάθε $t \in [0, \tau_f)$. Επομένως,  $\tau_f = \infty$. Από τον ορισμό του $\xi(t)$, έχουμε:
+\[
+- \rho_i(t) < - \bar \xi_i \rho_i(t) \leq \sigma_i(e^i(t)) \leq \bar \xi_i \rho_i(t) < \rho_i(t)
+\]
+για $i = 1,\ldots, m$ και για κάθε $t \geq 0$ και έτσι, $u \in \mathcal L_\infty$. Επιπλέον,   $e \in \mathcal L_\infty$ καθώς δε ξεφεύγει ποτέ του $\Omega_e$ και για $i =1,\ldots, m$, κάθε σφάλμα παρακολούθησης εξόδου $w^i$ συγκλίνει τουλάχιστον εκθετικά γρήγορα, με ρυθμό $\exp(-\lambda_i t)$, στο σύνολο $W_i = \qty{w_i \in \R: |w^i| \leq \rho^i_\infty/\prod_{j=1}^{r_i - 1} b_j^i}$, ολοκληρώνοντας έτσι την απόδειξη του Θεωρήματος~\ref{theorem_sf}.
+\end{proof}
+
+\subsection{Κορεσμός εισόδου}
+\label{section:input_saturation}
+Στην προηγούμενη ενότητα δείξαμε πως $\xi$  εξελίσσεται μέσα σε ένα κλειστό και συμπαγές υποσύνολο του $(-1, 1)^{m}$, και πιο συγκεκριμένα το $\Xi = \prod_{i=1}^m \Xi_i$, όπου:
+\[
+    \xi_i(t) \in \Xi_i = 
+    [- \bar \xi_i, \bar \xi_i],\ 
+    \text{for}\ t \geq 0.
+\]
+Επομένως, η μέγιστη τιμή που μπορεί να αποκτήσει το $u_i$ ορίζεται ως:
+\[
+    \bar u_i = \frac{2 k_i T(\bar \xi_i)}
+    {(1- \bar \xi_i^2) \rho_\infty^i}.
+\]
+Τότε, θα υπάρχουν θετικές σταθερές $\xi_i^\star$, οι οποίες θα ικανοποιούν $\bar \xi_i < \xi_i^\star < 1$, τέτοιες ώστε $\Xi \subset \Xi^\star$ με $\Xi^\star = \prod_{i=1}^m \Xi_i^\star$ και $\Xi_i^\star = [-\xi_i^\star, \xi_i^\star]$, για κάθε $i = 1, \ldots, m$. Αντίστοιχα με το $\bar u_i$ ορίζουμε ως $u_i^\star$ το φράγμα του $u_i$ στο σύνολο $\Xi^\star$. Άρα,
+\[
+    u_i^\star = \frac{2 k_i T(\xi_i^\star)}
+    {(1- (\xi_i^\star)^2) \rho_\infty^i},\ i=1, \ldots, m.
+\]
+Χάριν στη μονοτονία του $\flatfrac{T(\xi_i)}{\pqty{1 - \xi_i^2}}$ στο $\xi_i$, αν $\xi_i^\star > \bar \xi_i$, συνεπάγεται ότι το $u_i^\star > \bar u_i$. Ορίζουμε την είσοδο υπό κορεσμό ως 
+\begin{equation}
+\label{eq:control_state_feedback_sat}
+    u_s(t, e) = \begin{bmatrix}
+        u_1^\star \sat\left(\frac{1}{u_1^\star} u_1(t, e^1) \right)\\
+        u_2^\star \sat\left(\frac{1}{u_2^\star} u_2(t, e^2) \right)\\
+        \vdots\\
+        u_m^\star \sat\left(\frac{1}{u_m^\star} u_m(t, e^m) \right)\\
+    \end{bmatrix}_{m \times 1}
+\end{equation}
+όπου το $u_i(t, e^i)$ έχει οριστεί στην~\eqref{eq:state_feedback_control_elementwise}. Υπό ανάδραση καταστάσεων, η~\eqref{eq:control_state_feedback_sat} θα παραμείνει στη γραμμική περιοχή του κορεσμού και ως εκ τούτου ο κλειστός βρόχος και η συμπεριφορά του θα παραμείνουν ανεπηρέαστα.
+
+\subsection{Σχεδίαση ελέγχου με ανάδραση εξόδου}
+\label{section:output_feedback}
+Καθώς το διάνυσμα καταστάσεων δεν είναι διαθέσιμο, παρά μόνο οι μετρήσιμοι έξοδοι, μπορούμε να χρησιμοποιήσουμε ένα παρατηρητή υψηλού κέρδους~\cite{khalil1996noninear, atassi1999separation, khalil2008high} ώστε να αποκτήσουμε μια εκτίμηση $\hat e$ για τις καταστάσεις του συστήματος~\eqref{eq:sys2} που θα καθορίζεται από το μετρήσιμο σφάλμα παρακολούθησης εξόδου $w$, η οποία εκτίμηση $\hat e$ περιγράφεται από την ακόλουθη δυναμική:
+\[
+    \dot{\hat e} = A \hat e + H (w - C \hat e),
+\]
+όπως περιγράφηκε στο Βήμα~\ref{item:hgo} της διαδικασίας σχεδίασης. Τότε, ορίζουμε τα κανονικοποιημένα σφάλματα εκτίμησης
+\[
+    \zeta_j^i = \frac{e_j^i - \hat e_j^i}{\mu^{r_i-j}},
+\]
+για κάθε $i=1,\ldots,m$ και $j = 1,\ldots, r_i$. Επομένως έχουμε $\hat e = e - \Theta(\mu) \zeta$, όπου $\Theta(\mu) = \bdiag(\Theta_1, \ldots, \Theta_m)$ και $\Theta_i = \diag(\mu^{r_i-1}, \ldots, 1)$ a $r_i \times r_i$ πίνακας. Μπορούμε πλέον να ορίσουμε τον πίνακα
+\[
+    A_0 = \mu \Theta^{-1}(\mu)(A - HC) \Theta(\mu),
+\]
+ο οποίος διατηρεί την ευστάθεια \hur\ του πίνακα $A-HC$. Αντικαθιστούμε $e$ με το $\hat e$ στην είσοδο ελέγχου~\eqref{eq:control_state_feedback_sat} προκειμένου να καταλήξουμε στο νόμο ελέγχου~\eqref{eq:control_law}, δίνοντας μας το ακόλουθο επαυξημένο σύστημα σφαλμάτων:
+\begin{subequations}
+    \label{eq:sys4}
+    \begin{align}
+        \dot z &= f_0(z, e + \psi(t), d(t))\\
+        \begin{split}
+            \dot e &= A e + B \left(f(z,e + \psi(t), d(t)) \right. \\
+            &\quad \left. + G(z,e + \psi(t), d(t)) u_s(t, e - \Theta\zeta) 
+                - \upsilon(t)\right)
+        \end{split}\\
+        \begin{split}
+            \dot \xi &= \Rho^{-1}(t) \left(
+                    \varphi(t,z,e) \vphantom{\dot \Rho} \right.  \\
+            &\quad \left. + G(z, e + \psi(t), d(t))u_s(t,e - \Theta \zeta)
+                - \dot \Rho(t)\xi \right)
+        \end{split}\\
+        \begin{split}
+        \mu \dot \zeta &= A_0\zeta 
+            + \mu B \left(f(z,e + \psi(t), d(t)) \right. \\
+        &\quad \left. + G(z,e + \psi(t), d(t)) u_s(t, e - \Theta\zeta) 
+            - \upsilon(t)\right)
+        \end{split}
+    \end{align}
+\end{subequations}
+όπου το $\mu$ παραλείπεται ως όρισμα του $\Theta$ χάριν συντομίας, o $B$ είναι ένας $r\times m$ μπλοκ-διαγώνιος πίνακας, με τα στοιχεία της διαγωνίου $B_i = \col\pqty{0,\ldots,0,1}$ να είναι $r_i \times 1$ διανύσματα και τέλος $\upsilon(t) = \col\pqty{(\dv*{t})^{r_1} y_d^1(t), \ldots, (\dv*{t})^{r_m} y_d^m(t)}$. Μπορούμε πλέον να διατυπώσουμε και να αποδείξουμε το ακόλουθο θεώρημα.
+
+\begin{theorem}
+    \label{theorem_of}
+    Έστω το σύστημα~\eqref{eq:sys1} και οι \Cref{assumption:bibs,assumption:init_set,assumption:output,assumption:reference,assumption:posdef}. Έστω επίσης ο παρατηρητής~\eqref{eq:hgo}, με τις αρχικές του συνθήκες να βρίσκονται εντός ενός γνωστού συμπαγούς συνόλου $\Gamma_0 \subset \R^{r}$, και με παραμέτρους $\eta_1^i, \ldots, \eta_{r_i}^i$, $i = 1,\ldots, m$, επιλεγμένες όπως έχει περιγραφεί στο Βήμα~\ref{item:hgo} της Ενότητας~\ref{section:control}. Τέλος, έστω και ο ελεγκτής ανάδρασης εξόδου~\eqref{eq:surface estimate},~\eqref{eq:control_law} με 
+    \begin{enumerate*}[label=(\alph*)]
+        \item παραμέτρους $a_1^i, \ldots, a_{r_i-1}^i$ και συναρτήσεις επίδοσης $\rho_i$, $i = 1,\ldots, m$ επιλεγμένες όπως περιγράφεται στα Βήματα~\ref{item:surface_parameters} και~\ref{item:rho_parameters} της Ενότητας~\ref{section:control} και
+        \item επίπεδα κορεσμού $u_i^\star$, $i = 1,\ldots, m$, επιλεγμένα όπως περιγράφεται στην  \cref{section:input_saturation}.
+    \end{enumerate*}
+    Τότε, υπάρχει μια σταθερά $\bar \mu > 0$, τέτοια ώστε για κάθε $\mu \in (0, \bar \mu)$, το πρόβλημα ΕΠΑΑΕ για το σύστημα~\eqref{eq:sys1} λύνεται.
+\end{theorem}
+
+
+\begin{proof}
+    Ξαναγράφουμε τον κλειστό βρόχο~\eqref{eq:sys4} στην πιο συμπαγή μορφή:
+    \begin{align*}
+    \begin{split}
+        \dot z &= f_0(z, e + \psi(t), d(t))\\
+        \dot e &= A e + B \Delta(t, z, e, \xi, \zeta)\\
+        \dot \xi &= h(t, z, e, \xi, \zeta)\\
+        \mu \dot \zeta &= A_0\zeta + \mu B \Delta(t, z, e, \xi, \zeta)
+    \end{split}
+    \end{align*}
+    όπου
+    \begin{align*}
+        \Delta(t, z, e, \xi, \zeta) = & f(z,e + \psi(t), d(t))\\
+        & + G(z,e + \psi(t), d(t)) u_s(t, e - \Theta\zeta) - \upsilon(t)
+    \end{align*}
+    και
+    \begin{align*}
+        h(t, z, e, \xi, \zeta) = & \varphi(t,z,e) \\
+        & + G(z, e + \psi(t), d(t))u_s(t,e - \Theta \zeta) - \dot \Rho(t)\xi.
+    \end{align*}
+    Ορίζουμε το σύνολο $Q^* = \Omega_z \times \Omega_e \times \Xi^\star$. Από την \Cref{assumption:reference}, το γεγονός ότι το  $d(t)$ είναι φραγμένο εκ κατασκευής, το ολικώς φραγμένο του $u_s(t, x - \Theta(\mu)\zeta)$, και το Θεώρημα Ακρότατων Τιμών, προκύπτει ότι, για κάθε $(z, e, \xi) \in Q^\star$ και $\zeta \in \mathbb R^r$, έχουμε
+    \begin{equation}
+    \label{eq:bounds1}
+        \norm{h(t,z,e,\xi,\zeta)} \leq c_1\ \text{και}\ 
+        \norm{\Delta(t,z,e,\xi,\zeta)} \leq c_2,
+    \end{equation}
+    όπου $c_1$ και $c_2$ είναι θετικές σταθερές ανεξάρτητες του $\mu$. Ολοκληρώνοντας την πρώτη ανισότητα από τις~\eqref{eq:bounds1} και χρησιμοποιώντας το γεγονός ότι $\xi(0) \in \Xi^\star$, έχουμε
+    \[
+        \norm{\xi(t) - \xi(0)} \leq c_1 t
+    \]
+    για όσο ισχύει $\xi(t) \in \Xi^\star$. Συνεπώς, υπάρχει μια χρονική στιγμή $\tau_1 > 0$, εξίσου ανεξάρτητη του $\mu$, τέτοια ώστε $\xi(t) \in \Xi^\star$ για κάθε $t \in [0, \tau_1]$, και εφόσον το $e(t)$ δε μπορεί να ξεφύγει του $\Omega_e$ ούτε το $z(t)$ του $\Omega_z$ χωρίς πρώτα το $\xi(t)$ να ξεφύγει από το $\Xi^\star$,  συμπεραίνουμε ότι $(z(t), e(t), \xi(t)) \in Q^\star$ για κάθε $t \in [0, \tau_1]$ και επομένως οι~\eqref{eq:bounds1} ισχύουν σε αυτό το χρονικό διάστημα.
+       
+    Τώρα θα αποδείξουμε ότι με την κατάλληλη επιλογή του $\mu$, τα κανονικοποιημένα σφάλματα εκτίμησης θα μειωθούν πολύ γρήγορα σε αυθαίρετα μικρές τιμές. Ορίζουμε την θετικά ορισμένη και μη-ακτινικά φραγμένη συνάρτηση $W(\zeta) = \zeta^\T P_0 \zeta$, με τον πίνακα $P_0 = P_0^\T > 0$ να αποτελεί τη λύση της εξίσωσης \lyap\ $P_0 A_0 + A_0^\T P_0 = - I$. Επίσης, ορίζουμε το σύνολο $\Sigma = \qty{\zeta \in \R^r: W(\zeta) \leq  \varrho \mu^2}$, με $\varrho > 0$. Παραγωγίζουμε τη $W(\zeta)$ στο χρόνο, έχουμε:
+    \begin{align*}
+        \dot W &= -\frac{1}{\mu}\zeta^\T \zeta 
+            + 2 \zeta^\T P_0 B\Delta(t, z, e, \xi_\sigma, \zeta)\\
+        &\leq -\frac{1}{\mu} \norm{\zeta}^2 + 2 c_2 \norm{P_0} \norm{\zeta},
+    \end{align*}
+    όπου $\norm{P_0} = \lambda_{\max}(P_0)$. Άρα, ισοδύναμα έχουμε
+    \[
+        \dot W \leq -\frac{1}{2 \mu} \norm{\zeta}^2,\ \text{για}\ \norm{\zeta} \geq 4\mu c_2 \norm{P_0}.
+    \]
+    ή
+    \[
+        \dot  W \leq - \frac{1}{2\mu \norm{P_0}} W,\ \text{για}\ W \geq 16 c_2^2 \norm{P_0}^3 \mu^2,
+    \]
+    για $t \in [0, \tau_1]$. Επιλέγοντας $\varrho = 16 c_2^2 ||P_0||^3$, μπορούμε να εγγυηθούμε την αμεταβλητότητα του $\Sigma$. Το αρχικό σφάλμα $\zeta(0)$ θα ικανοποιεί μία σχέση της μορφής $||\zeta(0)|| \leq \beta/\mu^{r_{\max}-1}$, όπου $r_{\max} = \max_i \{r_1, \ldots, r_m\}$, για κάποια μη-αρνητική σταθερά $\beta$ εξαρτώμενη από τα σύνολα αρχικοποίησης $X_0$, $\Gamma_0$. Επομένως, κατά το χρονικό διάστημα $[0, \tau_1]$ έχουμε
+    \[
+        W(\zeta(t)) \leq \frac{\omega_1}{\mu^{2(r_{\max}-1)}} \exp\left( -\omega_2 t/\mu \right),
+    \]
+    όπου $\omega_1 = \beta^2||P_0||$ και $\omega_2 = \flatfrac{1}{2||P_0||}$. Συνεπώς, το $\zeta(t)$ εισέρχεται στο $\Sigma$ εντός του χρονικού διαστήματος $[0, \tau(\mu)]$ όπου 
+    \[
+        \tau(\mu) = \frac{\mu}{\omega_2} \ln\left( \frac{\omega_1}{\varrho \mu^{2r_{\max}}} \right).
+    \]
+    Είναι εμφανές πως $\tau(\mu) \rightarrow 0$ καθώς $\mu \rightarrow 0$, και ως εκ τούτου θα υπάρχει $\mu_1$ τέτοιο ώστε $\mu \in (0, \mu_1)$, $\tau(\mu) < \tau(\mu_1) \leq \tau_1$.
+    
+    Επιπλέον, χάριν στη συνέχεια κατά \lip\ του $u_s(\cdot)$, για κάθε $0 <  \mu_2 < 1$, θα υπάρχει μία θετική σταθερά $L_1$, ανεξάρτητη του $\mu$, τέτοια ώστε για κάθε $\mu \in (0, \mu_2)$ και $(z, e, \xi, \zeta) \in \Lambda$, όπου $\Lambda = Q^\star \times \Sigma$, να ισχύει:
+    \begin{equation}
+        \label{eq:bounds2}
+        \norm{u_s(t,e - \Theta(\mu)\zeta) - u_s(t, e)} \leq L_1 \norm{\zeta}.    
+    \end{equation}
+    Επιπλέον, να σημειωθεί ότι για $(z, e, \xi, \zeta) \in \Lambda$, το $u_s(t,e)$ δε θα φτάσει τον κορεσμό και συνεπώς είναι ισοδύναμο με το $u(t,e)$.
+
+    Θεωρούμε τη συνάρτηση $V = \varepsilon^\T K \varepsilon$, την οποία χρησιμοποιήσαμε και στην ανάλυση με ανάδραση καταστάσεων, της οποίας η παράγωγος πάνω στις τροχιές του~\eqref{eq:sys4} ειναι:
+    \begin{align*}
+        \dot V &= \varepsilon^\T K D(t,\xi) \left( 
+            - G(z, e + \psi(t), d(t)) u_s(t, e - \Theta(\mu)\zeta) 
+            \vphantom{\dot \Rho}\right.\\
+        &\quad \left.+ \varphi(t,z,e) + \dot \Rho(t) \xi \right)
+    \end{align*}
+    Έστω $\tau_2 > \tau_1$ η πρώτη χρονική στιγμή όπου το $\xi(t)$ ξεφεύγει από το $\Xi^\star$. Τότε, για κάθε $t \in [\tau(\mu), \tau_2)$, οι τροχιές $(z(t), e(t), \xi(t), \zeta(t))$ εξελίσσονται στο εσωτερικό του $\Lambda$, η σχέση~\eqref{eq:bounds2} ισχύει, και για τη $\dot V$ έχουμε: 
+    \begin{equation}
+    \label{eq:vn2}
+        \dot V \leq - \ubar G_s \norm{K D(t, \xi) \varepsilon}^2
+        + \norm{K D(t, \xi) \varepsilon} (\bar \varphi + \kappa \mu),
+    \end{equation}
+    όπου $\kappa = L_1 \bar G \sqrt{\varrho / \lambda_{\min}(P_0)}$, με 
+    \begin{align*}
+        \bar{G} &= \max \norm{G(z, e + \psi(t), d(t))} \\
+        &\qq{\textlatin{ s.t.}}  (z, e) \in Z \times \Omega_e \text{ και } t \in [0, \tau_2).
+    \end{align*}
+    Είναι εμφανές ότι υπάρχει μια σταθερά $\mu_3 > 0$ τέτοια ώστε για κάθε $\mu \in (0,\mu_3)$, η σχέση~\eqref{eq:vn2} να είναι αρνητικά ορισμένη στο σύνορο $\partial \Xi^\star$. Καθώς η $\dot W$ είναι αρνητικά ορισμένη στο σύνορο $\partial \Sigma$ και το μέγεθος των $\Omega_z$ και $\Omega_e$ είναι ανεξάρτητο του $\tau_2$, αποδεικνύεται η θετική αμεταβλητότητα του $Q^\star$, και επομένως του $\Lambda$. 
+
+    Συμπερασματικά, για οποιοδήποτε $\mu < \bar \mu = \min\{\mu_1, \mu_2, \mu_3\}$ εγγυόμαστε πως οι τροχιές $(z(t), e(t), \xi(t), \zeta(t))$ θα εισέλθουν στο εσωτερικό του $\Lambda$ σε πεπερασμένο χρόνο, και, εξαιτίας της αμεταβλητότητάς του δε θα ξεφύγουν από αυτό για κανένα $t \in [0, \tau_2)$. Επομένως, όπως και στο  \Cref{theorem_sf}, μπορεί να δειχθεί ότι $\tau_2 = \infty$. Άρα, χρησιμοποιώντας το \Cref{lemma}, συμπεραίνουμε πως οι όλες οι τροχιές του κλειστού βρόχου είναι φραγμένες για κάθε $t \geq 0$ και τα σφάλματα παρακολούθησης εξόδου $e_1^i$ συγκλίνουν στο σύνολο $E_i = \qty{e_1^i \in \R: |e_1^i| \leq e^i_\infty}$, με ρυθμό τουλάχιστον $\exp(- \lambda_i t)$, για $i = 1, \ldots, m$, ολοκληρώνοντας έτσι την απόδειξη του Θεωρήματος~\ref{theorem_of}.
+\end{proof}

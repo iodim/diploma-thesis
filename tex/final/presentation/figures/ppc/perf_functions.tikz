@@ -1,0 +1,61 @@
+\tikzstyle{every node}=[font=\footnotesize]
+\pgfplotsset{every tick/.style={draw=none}}
+
+\begin{tikzpicture}
+\begin{axis}[%
+    width=\figurewidth,
+    height=0.465\figureheight,
+    at={(0\figurewidth,0.507\figureheight)},
+    scale only axis,
+    xmin=0,
+    xmax=5,
+    ymin=-1.3,
+    ymax=3.1,
+    ylabel style={font=\color{white!15!black}},
+    xtick = \empty,
+    ytick = {-1.05, -0.175, 0.5, 2.1, 3},
+    yticklabels = {$-M_i\rho_0^i$, $-M_i\rho_\infty^i$, $\rho_\infty^i$, $e_i(0)$, $\rho_0^i$},
+    axis background/.style={fill=white},
+    legend style={legend cell align=left, align=left, draw=white!15!black},
+    xlabel style={font=\footnotesize},ylabel style={font=\footnotesize},ticklabel style={font=\scriptsize},x tick label style={font=\scriptsize},y tick label style={font=\scriptsize},legend style={font=\scriptsize}
+]
+\addplot [black, name path = A, dashed, domain=0.001:4.999, samples=101] {(3 - 0.5)*exp(-1.5*x) + 0.5};
+\addplot [black, name path = B, dashed, domain=0.001:4.999, samples=101] {-0.35*((3 - 0.5)*exp(-1.5*x) + 0.5)};
+\addplot [black, smooth] coordinates {(0,2.1) (0.3,-0.4) (1.5,0.5) (3.5,0.1) (5,0.1)};
+\addplot [black, dotted] coordinates {(0,0.5) (5,0.5)};
+\addplot [black, dotted] coordinates {(0,-0.175) (5,-0.175)};
+\addplot [gray!30] fill between [of=A and B];
+\node [] at (axis cs: 0.3,1) {$e_i(t)$};
+\node [] at (axis cs: 0.6,2.3) {$\rho_i(t)$};
+\node [] at (axis cs: 0.8,-0.95) {$-M_i \rho_i(t)$};
+\end{axis}
+
+\begin{axis}[%
+width=\figurewidth,
+height=0.465\figureheight,
+at={(0,0)},
+scale only axis,
+xmin=0,
+xmax=5,
+ymax=1.3,
+ymin=-3.1,
+ylabel style={font=\color{white!15!black}},
+xlabel = {Time, $t$},
+xtick = \empty,
+ytick = {1.05, 0.175, -0.5, -2.1, -3},
+yticklabels = {$M_i\rho_0^i$, $M_i\rho_\infty^i$, $-\rho_\infty^i$, $e_i(0)$, $-\rho_0^i$},
+axis background/.style={fill=white},
+legend style={legend cell align=left, align=left, draw=white!15!black},
+xlabel style={font=\footnotesize},ylabel style={font=\footnotesize},ticklabel style={font=\scriptsize},x tick label style={font=\scriptsize},y tick label style={font=\scriptsize},legend style={font=\scriptsize}
+]
+\addplot [black, name path = A, dashed, domain=0.001:4.999, samples=101] {-(3 - 0.5)*exp(-1.5*x) - 0.5};
+\addplot [black, name path = B, dashed, domain=0.001:4.999, samples=101] {0.35*((3 - 0.5)*exp(-1.5*x) + 0.5)};
+\addplot [black, smooth] coordinates {(0,-2.1) (0.3,0.4) (1.5,-0.5) (3.5,-0.1) (5,-0.1)};
+\addplot [black, dotted] coordinates {(0,-0.5) (5,-0.5)};
+\addplot [black, dotted] coordinates {(0,0.175) (5,0.175)};
+\addplot [gray!30] fill between [of=A and B];
+\node [] at (axis cs: 0.3,-1) {$e_i(t)$};
+\node [] at (axis cs: 0.6,-2.3) {$-\rho_i(t)$};
+\node [] at (axis cs: 0.8,0.95) {$M_i \rho_i(t)$};
+\end{axis}
+\end{tikzpicture}

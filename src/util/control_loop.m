@@ -39,10 +39,20 @@ function [dq] = control_loop(t, q, plant, n, controller, observer, C)
             C = [1 zeros(1, n(1)-1)];
         end
         [dz, xhat] = observer(t, z, C*x);
-        [u, dw] = controller(t, xhat, w);
+        if n(2) ~= 0
+            [u, dw] = controller(t, xhat, w);
+        else
+            dw = [];
+            u = controller(t, xhat);
+        end
     else
         dz = [];
-        [u, dw] = controller(t, x, w);
+        if n(2) ~= 0
+            [u, dw] = controller(t, x, w);
+        else
+            dw = [];
+            u = controller(t, x);
+        end
     end
     dx = plant(t, x, u);
     dq = [dx(:); dw(:); dz(:)];

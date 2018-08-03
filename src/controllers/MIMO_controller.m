@@ -6,8 +6,8 @@ function [u, dw] = MIMO_controller(t, x, A, controller, yd, w)
 %   Given the whole state vector of an m-input m-output system of n-th
 %   order, and the matrix A which associates inputs to outputs, this
 %   function produces a m x 1 vector u along with the optional dw vector as
-%   output. Assumes that the input parameter controller is a function
-%   handle of the following form:
+%   output. Assumes that the input parameter controller is a function 
+%   handle (or a cell array of them) of the following form:
 %       
 %       [u, dw] = controller(t, x, y, w)
 %   
@@ -28,8 +28,11 @@ function [u, dw] = MIMO_controller(t, x, A, controller, yd, w)
     
     for i = 1:m
         xm = x(A(i, :));
-        if adaptive, [u(i), dw(i)] = controller(t, xm, @(t) y(i), w);
-        else, u(i) = controller(t, xm, @(t) y(i));
+        if iscell(controller), controller_i = controller{i};
+        else, controller_i = controller;
+        end
+        if adaptive, [u(i), dw(i)] = controller_i(t, xm, @(t) y(i, :)', w);
+        else, u(i) = controller_i(t, xm, @(t) y(i, :)');
         end
     end
 end

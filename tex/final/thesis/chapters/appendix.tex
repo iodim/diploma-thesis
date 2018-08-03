@@ -1,0 +1,133 @@
+\chapter{Παράρτημα}
+\label{chap:appendix}
+
+\section{Γραμμική άλγεβρα}
+
+    \begin{definition}
+        Έστω $p \geq 1$ ένας πραγματικός αριθμός. Ονομάζουμε $p$-νόρμα ενός πραγματικού διανύσματος $x = (x_1, \ldots, x_n)$ το βαθμωτό μέγεθος
+        \[
+            \norm{x}_p \triangleq \pqty{\sum_{i=1}^n \abs{x_i}^p}^{\flatfrac{1}{p}}.
+        \]
+    \end{definition}
+    
+    \begin{definition}
+        Ονομάζουμε απειροστή νόρμα ενός πραγματικού διανύσματος $x = (x_1, \ldots, x_n)$ το βαθμωτό μέγεθος
+        \[
+            \norm{x}_\infty \triangleq \lim_{p \rightarrow \infty} \norm{x}_p = \max_i \abs{x_i}.
+        \]
+    \end{definition}
+    
+    \begin{convention}
+        Εκτός και αν αναφέρεται ρητά αλλιώς, καθ'όλη την εργασία αυτή με $\norm{\cdot}$ αναφερόμαστε στην ευκλείδεια νόρμα $\norm{\cdot}_2$.
+    \end{convention}
+    
+    \begin{definition}
+        Ονομάζουμε ένα πραγματικό, συμμετρικό $n \times n$ πίνακα $A$ θετικά ορισμένο εφόσον ικανοποιεί τη σχέση $x^\T A x > 0$ ή θετικά ημι-ορισμένο όταν $x^\T A x \geq 0$. Αντιστοίχως ορίζουμε και τους αρνητικά (ημι)ορισμένους πίνακες.
+    \end{definition}
+    
+    \begin{property}
+        Για κάθε πραγματικό διάνυσμα $x = (x_1, \ldots, x_n)$ και για κάθε θετικά ορισμένο $n \times n$ πίνακα $A$ ισχύει:
+        \[
+            \lambda_{\min}(A) \norm{x}^2 \leq x^\T A x \leq \lambda_{\max}(A) \norm{x}^2,
+        \]
+        όπου $\lambda_{\min}(\cdot)$ και $\lambda_{\max}(\cdot)$ η ελάχιστη και μέγιστη ιδιοτιμή ενός πίνακα. 
+    \end{property}
+    
+    \begin{definition}
+        Ονομάζουμε $p$-νόρμα ενός πραγματικού $m \times n$ πίνακα $A$ το βαθμωτό μέγεθος
+        \[
+        \norm{A}_p \triangleq \max_{\norm{x}_p = 1} \norm{Ax}_p
+        \]
+    \end{definition}
+    
+    \begin{convention}
+        Ως απόρροια της προηγούμενης σύμβασης, όταν αναφερόμαστε στη νόρμα ενός πίνακα $\norm{A}$, αναφερόμαστε στην νόρμα $\norm{A}_2$. Σε αυτή τη περίπτωση έχουμε $\norm{A} = \sqrt{\lambda_{\max}(A^\T A)}$.
+    \end{convention}
+
+    \begin{property}
+        Για κάθε πραγματικό διάνυσμα $x = (x_1, \ldots, x_n)$ και για κάθε ζεύγος πραγματικών $n \times n$ πινάκων $A$ και $B$ ισχύει
+        \begin{enumerate}
+            \item $\norm{AB} \leq \norm{A} \norm{B}$
+            \item $\norm{ABx} \leq \norm{A} \norm{Bx} \leq \norm{A} \norm{B} \norm{x}$
+        \end{enumerate}
+    \end{property}
+
+\section{Κλάσεις συναρτήσεων}
+
+    \begin{convention}
+        Με $\R_+$ συμβολίζουμε το σύνολο τον μη-αρνητικών πραγματικών αριθμών $[0, \infty)$.
+    \end{convention}
+
+    \begin{definition}
+        Μία συνάρτηση $f: \R^n \rightarrow \R$ ονομάζεται θετικά ορισμένη, όταν $f(x) > 0$ για κάθε $χ \neq 0$ και $f(0) = 0$.
+    \end{definition}
+
+    \begin{definition}
+        Μία συνάρτηση $f: \R^n \rightarrow \R$ ονομάζεται μη-φραγμένη ακτινικά όταν ισχύει
+        \[
+            \lim_{\norm{x} \rightarrow \infty} f(x) = \infty.
+        \]
+    \end{definition}
+
+    \begin{definition}[\cite{khalil1996noninear}]
+        Μία συνεχής συνάρτηση $f:[0, a) \rightarrow \R_+$ ανήκει στην κλάση $\mathcal K$ ($f(x) \in \mathcal K$) αν είναι γνησίως αύξουσα στο διάστημα $[0, a)$ και $f(0) = 0$. Επιπλέον, λέμε πως μία συνάρτηση ανήκει στην κλάση $\mathcal K_\infty$ αν $a = \infty$ και είναι μη-φραγμένη ακτινικά, δηλαδή $\lim_{x \rightarrow \infty} f(x) = \infty$.
+    \end{definition}
+
+    \begin{definition}
+        Μια συνάρτηση ανήκει στην κλάση διαφορισιμότητας $\mathcal C^k$ όταν έχει συνεχείς παραγώγους μέχρι τάξης $k$.
+    \end{definition}
+
+    \begin{definition}[\cite{adams2003sobolev}]
+        Έστω $\Omega$ ένα χωρίο του $\R^n$ και έστω ένας πραγματικός αριθμός $p \geq 1$. Ορίζουμε την κλάση συναρτήσεων $\mathcal L_p(\Omega)$ στην οποία ανήκουν όλες οι μετρήσιμες συναρτήσεις $f: \Omega \rightarrow \R$ που ικανοποιούν τη σχέση
+        \[
+            \int_\Omega \abs{f(x)}^p \mathrm d x < \infty.
+        \]
+    \end{definition}
+
+    \begin{definition}[\cite{adams2003sobolev}]
+        Ορίζουμε την κλάση συναρτήσεων $\mathcal L_\infty(\Omega)$ στην οποία ανήκουν όλες οι μετρήσιμες συναρτήσεις $f:\Omega \rightarrow \R$ που ικανοποιούν τη σχέση
+        \[
+            \esssup_{x\in\Omega} \abs{f(x)} < \infty.
+        \]
+    \end{definition}
+
+    \begin{convention}
+        Πολλές φορές όταν το χωρίο στο οποίο ορίζεται μία συνάρτηση είναι προφανές, χάριν συντομίας θα γράφουμε $f \in \mathcal L_\infty$.
+    \end{convention}
+
+\section{Δυναμικά συστήματα}
+
+    \begin{definition}[\cite{sontag1998}]
+        \label{def:ivp}
+        Έστω τα μη-κενά ανοιχτά σύνολα $\mathcal I \subset \R_+$ και $\mathcal X \subset \R^n$. Ονομάζουμε ως \emph{πρόβλημα αρχικής τιμής} τη διαφορική εξίσωση $\dot x = f(t, x(t))$, με την αρχική συνθήκη $x(0) = x_0 \in \mathcal X$ και το διανυσματικό πεδίο $f:\mathcal I\times \mathcal X \rightarrow \R^n$, που πληρεί τις ακόλουθες υποθέσεις:
+        \begin{enumerate}
+            \item η $f(\cdot, x): \mathcal I \rightarrow \R^n$ είναι μετρήσιμη για κάθε σταθερό $x$, και
+            \item η $f(t, \cdot): \R^n \rightarrow \R^n$ είναι συνεχής για κάθε σταθερό $t$.
+        \end{enumerate}
+        Ονομάζουμε \emph{λύση} του προβλήματος αρχικής τιμής μία απόλυτα συνεχή συνάρτηση $x: \mathcal I \rightarrow \mathcal X$ που επαληθεύει την ολοκληρωτική εξίσωση
+        \[
+            x(t) = x_0 + \int_0^t f(\tau, x(\tau)) \mathrm d\tau.
+        \]
+    \end{definition}
+
+    \begin{definition}[\cite{sontag1998}]
+        Μία λύση $x(t)$, $\forall t \in [0, \tau_f)$ ενός προβλήματος αρχικής τιμής ονομάζεται \emph{μέγιστα επεκτεταμένη}, αν δεν υπάρχει κανονική επέκτασή της για $t > \tau_f$ που να αποτελεί επίσης λύση του ίδιου προβλήματος αρχικής τιμής.
+    \end{definition}
+
+    \begin{theorem}[\cite{sontag1998}]
+        \label{thm:maximal}
+        Έστω το πρόβλημα αρχικής τιμής $\dot x = f(t, x(t))$, $x(0) = x_0 \in \mathcal X$, όπως ορίστηκε στον Ορισμό~\ref{def:ivp}. Επιπλέον έστω ότι:
+        \begin{enumerate}
+            \item η $f$ είναι τοπικά \lip\ ως προς το $x$ και 
+            \item η $f$ είναι τοπικά ολοκληρώσιμη ως προς το $t$.
+        \end{enumerate}
+        Τότε υπάρχει μια μοναδική μέγιστα επεκτεταμένη λύση $x(t)$, $\forall t \in [0, \tau_f)$, τέτοια ώστε
+        \[
+            x(t) \in \mathcal X,\ \forall t  \in [0, \tau_f).
+        \]
+    \end{theorem}
+
+    \begin{proposition}[\cite{sontag1998}]
+        \label{thm:contr}
+        Κάτω από τις προϋποθέσεις του Θεωρήματος~\ref{thm:maximal}, για μια μέγιστα επεκτεταμένη λύση $x(t)$, $\forall t \in [0, \tau_f)$ του προβλήματος αρχικής τιμής όπως ορίστηκε στον Ορισμό~\ref{def:ivp}, με $\tau_f < \infty$ και για οποιοδήποτε σύνολο $\mathcal X' \subset \mathcal X$, υπάρχει χρονική στιγμή $t' \in [0, \tau_f)$ τέτοια ώστε $x(t') \notin \mathcal X'$.
+    \end{proposition}
